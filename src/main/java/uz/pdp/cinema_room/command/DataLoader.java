@@ -44,8 +44,8 @@ public class DataLoader implements CommandLineRunner {
         hallRepository.saveAll(hallList);
 
         List<PriceCategory> priceCategories = new ArrayList<>(Arrays.asList(
-           new PriceCategory("Category 1", 10.0, 1),
-           new PriceCategory("Category 2", 20.0, 2)
+           new PriceCategory("Category 1", 10.0, ""),
+           new PriceCategory("Category 2", 20.0, "")
         ));
 
         priceCategoryRepository.saveAll(priceCategories);

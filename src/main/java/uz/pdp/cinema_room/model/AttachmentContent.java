@@ -6,22 +6,21 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import uz.pdp.cinema_room.entity.AbsEntity;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.OneToOne;
+
 
 @EqualsAndHashCode(callSuper = true)
+@Entity(name = "attachment_contents")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Entity(name = "halls")
-public class Hall extends AbsEntity {
 
-    @Column(nullable = false, length = 50)
-    private String name;
+public class AttachmentContent extends AbsEntity {
 
-    private Double vip_additional_fee_in_percent;
+    private byte[] data;
 
-    public Hall(String name) {
-        this.name = name;
-    }
+    @OneToOne
+    private Attachment attachment;
 
 }
