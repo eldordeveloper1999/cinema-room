@@ -24,6 +24,6 @@ public class Distributor extends AbsEntity {
     private String description;
 
     @OneToOne
-    private Attachment logo;
+    private Attachment attachment;
 
 }
