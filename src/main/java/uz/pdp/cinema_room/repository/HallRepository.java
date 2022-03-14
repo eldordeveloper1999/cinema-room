@@ -5,8 +5,10 @@ import org.springframework.stereotype.Repository;
 import uz.pdp.cinema_room.model.Hall;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface HallRepository extends JpaRepository<Hall, Integer> {
-    Optional<Hall> findById(Integer id);
+public interface HallRepository extends JpaRepository<Hall, UUID> {
+    Optional<Hall> findById(UUID id);
+
 }
