@@ -3,6 +3,7 @@ package uz.pdp.cinema_room.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uz.pdp.cinema_room.entity.AbsEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,10 +14,7 @@ import javax.persistence.Id;
 @NoArgsConstructor
 @Data
 @Entity(name = "users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+public class User extends AbsEntity {
 
     private String fullName;
 

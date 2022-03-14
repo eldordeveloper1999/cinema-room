@@ -4,6 +4,7 @@ package uz.pdp.cinema_room.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uz.pdp.cinema_room.entity.AbsEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,11 +15,7 @@ import javax.persistence.Id;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "price_categories")
-public class PriceCategory {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+public class PriceCategory extends AbsEntity {
 
     private String name;
 
