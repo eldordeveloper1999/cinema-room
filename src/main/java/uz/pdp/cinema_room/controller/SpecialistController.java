@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/actors")
+@RequestMapping("/api/specialist")
 public class SpecialistController {
 
         @Autowired
