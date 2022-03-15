@@ -4,21 +4,21 @@ package uz.pdp.cinema_room.command;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import uz.pdp.cinema_room.model.Hall;
-import uz.pdp.cinema_room.model.PriceCategory;
-import uz.pdp.cinema_room.model.Row;
-import uz.pdp.cinema_room.model.Seat;
-import uz.pdp.cinema_room.repository.HallRepository;
-import uz.pdp.cinema_room.repository.PriceCategoryRepository;
-import uz.pdp.cinema_room.repository.RowRepository;
-import uz.pdp.cinema_room.repository.SeatRepository;
+import uz.pdp.cinema_room.model.*;
+import uz.pdp.cinema_room.repository.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+
+import static java.time.LocalTime.now;
 
 @Component
 public class DataLoader implements CommandLineRunner {
+
+    @Autowired
+    MovieSessionRepository movieSessionRepository;
 
     @Autowired
     HallRepository hallRepository;
@@ -31,6 +31,21 @@ public class DataLoader implements CommandLineRunner {
 
     @Autowired
     SeatRepository seatRepository;
+
+    @Autowired
+    AttachmentRepository attachmentRepository;
+
+    @Autowired
+    DistributorRepository distributorRepository;
+
+    @Autowired
+    SpecialistRepository specialistRepository;
+
+    @Autowired
+    GenreRepository genreRepository;
+
+    @Autowired
+    MovieRepository movieRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -48,7 +63,14 @@ public class DataLoader implements CommandLineRunner {
            new PriceCategory("Category 2", 20.0, "")
         ));
 
+
         priceCategoryRepository.saveAll(priceCategories);
+        List<Genre> genres = new ArrayList<>(Arrays.asList(
+                new Genre("War"),
+                new Genre("Fantastic")
+        ));
+
+        genreRepository.saveAll(genres);
 
         List<Row> rows = new ArrayList<>(Arrays.asList(
                 new Row(1, hallList.get(1)),
@@ -83,5 +105,26 @@ public class DataLoader implements CommandLineRunner {
         ));
 
        seatRepository.saveAll(seats);
+
+        List<Attachment> all = attachmentRepository.findAll();
+
+        List<Distributor> distributors = distributorRepository.findAll();
+
+        List<Specialist> specialistList = specialistRepository.findAll();
+
+        List<Genre> genreList = genreRepository.findAll();
+
+
+        List<Movie> movies = new ArrayList<>(Arrays.asList(
+            new Movie("New Title", "Some Description", 120, 50.0, "", all.get(0), new Date(), 500.0, distributors.get(0), 60.0, specialistList, genreList)
+       ));
+
+        movieRepository.saveAll(movies);
+
+        List<MovieSession> movieSessionList = new ArrayList<>(Arrays.asList(
+                new MovieSession(movies.get(0), hallList.get(1))
+        ));
+
+        movieSessionRepository.saveAll(movieSessionList);
     }
 }

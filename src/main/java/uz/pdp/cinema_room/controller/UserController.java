@@ -46,11 +46,6 @@ public class UserController {
         return ResponseEntity.ok().body(rowRepository.findAll());
     }
 
-    @GetMapping("/halls")
-    public ResponseEntity<List<Hall>> getHalls() {
-        return ResponseEntity.ok().body(hallRepository.findAll());
-    }
-
     @GetMapping("/seats/{id}")
     public HttpEntity<List<Projection>> getRow(@PathVariable UUID id){
        List<Projection> byRowId = hallRepository.findByRowId(id);
