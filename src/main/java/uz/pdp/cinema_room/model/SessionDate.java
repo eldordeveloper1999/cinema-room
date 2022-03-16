@@ -19,6 +19,4 @@ public class SessionDate extends AbsEntity {
 
     private Timestamp date;
 
-    @OneToOne
-    private MovieSession session;
 }
