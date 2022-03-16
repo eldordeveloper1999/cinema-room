@@ -7,17 +7,17 @@ import lombok.NoArgsConstructor;
 import uz.pdp.cinema_room.entity.AbsEntity;
 
 import javax.persistence.Entity;
-import javax.persistence.OneToOne;
-import java.sql.Timestamp;
+import javax.persistence.ManyToOne;
 
-@Data
-@AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "session_times")
+@AllArgsConstructor
+@Data
+@Entity(name = "afishalar")
 @EqualsAndHashCode(callSuper = true)
-public class SessionTime extends AbsEntity {
+public class Afisha extends AbsEntity {
 
-    private Timestamp time;
+    @ManyToOne
+    private Movie movie;
 
-    private Double session_additional_fee_in_percent;
+    private Boolean is_active;
 }

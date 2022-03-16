@@ -37,7 +37,20 @@ public class DistributorService {
 
     public void saveOrUpdateDistributor(UUID distributorId, Distributor distributor, MultipartFile file) throws IOException {
         if (distributorId != null) {
+            distributorRepo.deleteById(distributorId);
+            Attachment attachment = new Attachment();
+            attachment.setFileName(StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())));
+            attachment.setContentType(file.getContentType());
+            attachment.setSize(file.getSize());
+            Attachment savedFile = attachmentRepo.save(attachment);
 
+            distributor.setAttachment(savedFile);
+            distributorRepo.save(distributor);
+
+            AttachmentContent fileAttachment = new AttachmentContent();
+            fileAttachment.setAttachment(savedFile);
+            fileAttachment.setData(file.getBytes());
+            attachmentContentRepo.save(fileAttachment);
         } else {
             Attachment attachment = new Attachment();
             attachment.setFileName(StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())));

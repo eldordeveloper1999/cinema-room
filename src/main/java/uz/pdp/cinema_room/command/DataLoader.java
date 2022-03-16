@@ -14,11 +14,9 @@ import java.util.List;
 
 import static java.time.LocalTime.now;
 
+
 @Component
 public class DataLoader implements CommandLineRunner {
-
-    @Autowired
-    MovieSessionRepository movieSessionRepository;
 
     @Autowired
     HallRepository hallRepository;
@@ -115,16 +113,16 @@ public class DataLoader implements CommandLineRunner {
         List<Genre> genreList = genreRepository.findAll();
 
 
-        List<Movie> movies = new ArrayList<>(Arrays.asList(
-            new Movie("New Title", "Some Description", 120, 50.0, "", all.get(0), new Date(), 500.0, distributors.get(0), 60.0, specialistList, genreList)
-       ));
+//        List<Movie> movies = new ArrayList<>(Arrays.asList(
+//            new Movie("New Title", "Some Description", 120, 50.0, "", all.get(0), new Date(), 500.0, distributors.get(0), 60.0, specialistList, genreList)
+//       ));
 
-        movieRepository.saveAll(movies);
+//        movieRepository.saveAll(movies);
 
-        List<MovieSession> movieSessionList = new ArrayList<>(Arrays.asList(
-                new MovieSession(movies.get(0), hallList.get(1))
-        ));
+//        List<MovieSession> movieSessionList = new ArrayList<>(Arrays.asList(
+//                new MovieSession(movies.get(0), hallList.get(1))
+//        ));
 
-        movieSessionRepository.saveAll(movieSessionList);
+//        movieSessionRepository.saveAll(movieSessionList);
     }
 }

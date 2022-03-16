@@ -8,18 +8,26 @@ import uz.pdp.cinema_room.entity.AbsEntity;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
-import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "movie_sessions")
+@Entity(name = "reserved_halls")
 @EqualsAndHashCode(callSuper = true)
-public class MovieSession extends AbsEntity {
-
-    @ManyToOne
-    private Movie movie;
+public class ReservedHall extends AbsEntity {
 
     @ManyToOne
     private Hall hall;
+
+    @ManyToOne
+    private SessionDate sessionDate;
+
+    @ManyToOne
+    private SessionTime start_time;
+
+    @ManyToOne
+    private SessionTime end_time;
+
+    @ManyToOne
+    private Afisha afisha;
 }
