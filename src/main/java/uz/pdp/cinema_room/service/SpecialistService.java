@@ -8,6 +8,7 @@ import uz.pdp.cinema_room.model.Attachment;
 import uz.pdp.cinema_room.model.AttachmentContent;
 import uz.pdp.cinema_room.model.Specialist;
 import uz.pdp.cinema_room.model.SpecialistType;
+import uz.pdp.cinema_room.projections.SpecialistProjection;
 import uz.pdp.cinema_room.repository.AttachmentContentRepository;
 import uz.pdp.cinema_room.repository.AttachmentRepository;
 import uz.pdp.cinema_room.repository.SpecialistRepository;
@@ -15,6 +16,7 @@ import uz.pdp.cinema_room.repository.SpecialistRepository;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -29,8 +31,16 @@ public class SpecialistService {
     @Autowired
     private AttachmentContentRepository attachmentContentRepo;
 
-    public List<Specialist> getAllActors() {
+    public List<Specialist> getAllSpecialists() {
         return specialistRepository.findAll();
+    }
+
+    public Optional<Specialist> getSpecialistById(UUID uuid) {
+        return specialistRepository.findById(uuid);
+    }
+
+    public List<SpecialistProjection> getSpecialistsByMovieId(UUID movieId) {
+        return specialistRepository.findAllByMovieId(movieId);
     }
 
     public void saveSpecialist(Specialist specialist, MultipartFile file) throws IOException {

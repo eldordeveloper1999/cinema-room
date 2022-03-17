@@ -20,6 +20,8 @@ public interface MovieRepository extends JpaRepository<Movie, UUID> {
             "where m.id = :movieId")
     MovieProjection findByMovieId(UUID movieId);
 
+
+
     @Query(nativeQuery = true, value = "select cast(m.id as varchar) as id, cast(d.id as varchar) as distributorId, m.duration_in_min as durationInMin, m.title as title,\n" +
             "       m.description, m.budget, d.name as distributor from movies m\n" +
             "           join distributors d on d.id = m.distributor_id\n")
