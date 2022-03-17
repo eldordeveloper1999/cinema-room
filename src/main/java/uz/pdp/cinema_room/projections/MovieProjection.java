@@ -26,6 +26,9 @@ public interface MovieProjection {
     @Value("#{@genreRepository.findAllByMovieId(target.id)}")
     List<GenreProjection> getGenres();
 
+    @Value("#{@specialistRepository.findAllByMovieId(target.id)}")
+    List<SpecialistProjection> getSpecialists();
+
     String getDistributorId();
 
     String getDistributor();

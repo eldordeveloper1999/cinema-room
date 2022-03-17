@@ -36,22 +36,22 @@ public class UserController {
     @Autowired
     HallRepository hallRepository;
 
-    @GetMapping("/seats")
-    public ResponseEntity<List<Seat>> getSeats() {
-        return ResponseEntity.ok().body(seatRepository.findAll());
-    }
+//    @GetMapping("/seats")
+//    public ResponseEntity<List<Seat>> getSeats() {
+//        return ResponseEntity.ok().body(seatRepository.findAll());
+//    }
 
-    @GetMapping("/rows")
-    public ResponseEntity<List<Row>> getRows() {
-        return ResponseEntity.ok().body(rowRepository.findAll());
-    }
+//    @GetMapping("/rows")
+//    public ResponseEntity<List<Row>> getRows() {
+//        return ResponseEntity.ok().body(rowRepository.findAll());
+//    }
 
-    @GetMapping("/seats/{id}")
-    public HttpEntity<List<Projection>> getRow(@PathVariable UUID id){
-       List<Projection> byRowId = hallRepository.findByRowId(id);
-
-        return ResponseEntity.ok().body(byRowId);
-    }
+//    @GetMapping("/seats/{id}")
+//    public HttpEntity<List<Projection>> getRow(@PathVariable UUID id){
+//       List<Projection> byRowId = hallRepository.findByRowId(id);
+//
+//        return ResponseEntity.ok().body(byRowId);
+//    }
 
 //    public List<CastProjection> getAllCastsByMovieId(@PathVariable(required = true) UUID movieId) {
 //        return castRepository.findByMovieId(movieId);
