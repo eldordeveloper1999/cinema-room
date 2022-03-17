@@ -9,6 +9,7 @@ import uz.pdp.cinema_room.entity.AbsEntity;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 import java.sql.Timestamp;
+import java.time.LocalTime;
 
 @Data
 @AllArgsConstructor
@@ -17,7 +18,7 @@ import java.sql.Timestamp;
 @EqualsAndHashCode(callSuper = true)
 public class SessionTime extends AbsEntity {
 
-    private Timestamp time;
+    private LocalTime time;
 
     private Double session_additional_fee_in_percent;
 }

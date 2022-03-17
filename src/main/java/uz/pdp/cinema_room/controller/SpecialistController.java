@@ -64,7 +64,7 @@ public class SpecialistController {
                 SpecialistType specialistType1 = SpecialistType.getSpecialistByDisplayName(displayName);
 
                 specialist.setCastType(specialistType1);
-                specialistService.updateSpecialist(specialistId, specialist, multipartFile);
+                specialistService.saveSpecialist(specialist, multipartFile);
                 return new ResponseEntity<>(new ApiResponse(true, "updated", specialist), HttpStatus.OK);
             } catch (IOException ignored) {
             }

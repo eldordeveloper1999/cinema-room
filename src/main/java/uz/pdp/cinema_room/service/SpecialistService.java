@@ -44,27 +44,41 @@ public class SpecialistService {
     }
 
     public void saveSpecialist(Specialist specialist, MultipartFile file) throws IOException {
+        if (specialist.getId() != null) {
+            deleteSpecialist(specialist.getId());
 
-        Attachment attachment = new Attachment();
-        attachment.setFileName(StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())));
-        attachment.setContentType(file.getContentType());
-        attachment.setSize(file.getSize());
-        Attachment savedFile = attachmentRepo.save(attachment);
+            Attachment attachment = new Attachment();
+            attachment.setFileName(StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())));
+            attachment.setContentType(file.getContentType());
+            attachment.setSize(file.getSize());
+            Attachment savedFile = attachmentRepo.save(attachment);
 
-        specialist.setPhoto(savedFile);
-        specialist.setCastType(SpecialistType.SPECIALIST_ACTOR);
-        specialistRepository.save(specialist);
+            specialist.setPhoto(savedFile);
+            specialist.setCastType(SpecialistType.SPECIALIST_ACTOR);
+            specialistRepository.save(specialist);
 
-        AttachmentContent fileAttachment = new AttachmentContent();
-        fileAttachment.setAttachment(savedFile);
-        fileAttachment.setData(file.getBytes());
-        attachmentContentRepo.save(fileAttachment);
+            AttachmentContent fileAttachment = new AttachmentContent();
+            fileAttachment.setAttachment(savedFile);
+            fileAttachment.setData(file.getBytes());
+            attachmentContentRepo.save(fileAttachment);
+        } else {
+            Attachment attachment = new Attachment();
+            attachment.setFileName(StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())));
+            attachment.setContentType(file.getContentType());
+            attachment.setSize(file.getSize());
+            Attachment savedFile = attachmentRepo.save(attachment);
 
+            specialist.setPhoto(savedFile);
+            specialist.setCastType(SpecialistType.SPECIALIST_ACTOR);
+            specialistRepository.save(specialist);
+
+            AttachmentContent fileAttachment = new AttachmentContent();
+            fileAttachment.setAttachment(savedFile);
+            fileAttachment.setData(file.getBytes());
+            attachmentContentRepo.save(fileAttachment);
+        }
     }
 
-    public void updateSpecialist(UUID specialistId, Specialist specialist, MultipartFile file) throws IOException {
-
-    }
 
     public void deleteSpecialist(UUID specialistId) {
 
