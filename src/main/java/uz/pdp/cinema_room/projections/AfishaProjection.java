@@ -18,17 +18,15 @@ public interface AfishaProjection {
     @Value("#{@movieRepository.findByAfishaId(target.id) }")
     MovieProjection getMovie();
 
-    LocalDate getDate();
-
-    String getDateId();
+    @Value("#{@sessionDateRepository.findByAfishaId(target.id) }")
+    SessionDateProjection getDate();
 
     LocalTime getStart_time();
 
     LocalTime getEnd_time();
 
-    String getHallName();
-
-    String getHallId();
+    @Value("#{@hallRepository.findByAfishaId(target.id)}")
+    HallProjection getHall();
 
     @Value("#{@distributorRepository.getFindAllByAfishaId(target.id)}")
     List<DistributorProjection> getDistributors();
