@@ -122,11 +122,11 @@ public class DataLoader implements CommandLineRunner {
 
 
 //        List<SessionTime> sessionTimes = new ArrayList<>(Arrays.asList(
-//                new SessionTime(LocalTime.of(20, 00, 00), 10.0)
+//                new SessionTime(LocalTime.of(22, 00, 00), 10.0)
 //        ));
 //
 //        sessionTimeRepository.saveAll(sessionTimes);
-//
+
 //        List<SessionDate> sessionDates = new ArrayList<>(Arrays.asList(
 //                new SessionDate(LocalDate.of(2022, 03, 20))
 //        ));
