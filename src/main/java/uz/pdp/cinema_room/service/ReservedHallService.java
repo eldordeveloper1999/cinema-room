@@ -8,7 +8,6 @@ import uz.pdp.cinema_room.repository.*;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -33,8 +32,8 @@ public class ReservedHallService {
         return reservedHallRepository.findAll();
     }
 
-    public Optional<ReservedHall> getReservedHallById(UUID uuid) {
-        return reservedHallRepository.findById(uuid);
+    public ReservedHall getReservedHallById(UUID uuid) {
+        return reservedHallRepository.getById(uuid);
     }
 
 //    public List<ReservedHallProjection> getReservedHallsByMovieId(UUID movieId) {

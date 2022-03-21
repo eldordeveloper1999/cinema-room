@@ -35,12 +35,12 @@ public class SpecialistService {
         return specialistRepository.findAll();
     }
 
-    public Optional<Specialist> getSpecialistById(UUID uuid) {
-        return specialistRepository.findById(uuid);
-    }
-
     public List<SpecialistProjection> getSpecialistsByMovieId(UUID movieId) {
         return specialistRepository.findAllByMovieId(movieId);
+    }
+
+    public Optional<Specialist> getSpecialistById(UUID uuid) {
+        return specialistRepository.findById(uuid);
     }
 
     public void saveSpecialist(Specialist specialist, MultipartFile file) throws IOException {

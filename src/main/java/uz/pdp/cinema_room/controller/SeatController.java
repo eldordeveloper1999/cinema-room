@@ -21,6 +21,7 @@ public class SeatController {
 
     @GetMapping("/{rh_id}")
     public ResponseEntity<ApiResponse> getAvailableSeats(@PathVariable UUID rh_id) {
-        return new ResponseEntity<>(new ApiResponse(true, "success", seatRepository.findAvailableSeatsByRHId(rh_id)), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse(
+                true, "success", seatRepository.findAvailableSeatsByRHId(rh_id)), HttpStatus.OK);
     }
 }

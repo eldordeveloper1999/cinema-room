@@ -32,4 +32,11 @@ public interface HallRepository extends JpaRepository<Hall, UUID> {
             "where s.id = :id")
     List<HallProjection> findBySeatId(UUID id);
 
+
+    @Query(nativeQuery = true, value = "select h.vip_additional_fee_in_percent from halls h\n" +
+            "join reserved_halls rh on h.id = rh.hall_id\n" +
+            "join \"rows\" r on h.id = r.hall_id\n" +
+            "join seats s on r.id = s.row_id\n" +
+            "where s.id = :seat_id")
+    Double getFee(UUID seat_id);
 }

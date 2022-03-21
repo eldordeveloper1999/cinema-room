@@ -35,4 +35,11 @@ public interface MovieRepository extends JpaRepository<Movie, UUID> {
             "       m.description, m.budget, d.name as distributor from movies m\n" +
             "           join distributors d on d.id = m.distributor_id\n")
     Page<MovieProjection> findAllByPage(Pageable pageable);
+
+
+    @Query(nativeQuery = true, value = "select ticket_init_price from movies\n" +
+            "join afishalar a on movies.id = a.movie_id\n" +
+            "join reserved_halls rh on a.id = rh.afisha_id\n" +
+            "where rh.id = :rh_id")
+    Double getPriceByRHId(UUID rh_id);
 }
