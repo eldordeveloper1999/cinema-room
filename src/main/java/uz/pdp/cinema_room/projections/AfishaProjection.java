@@ -26,8 +26,6 @@ public interface AfishaProjection {
     LocalTime getEnd_time();
 
     @Value("#{@hallRepository.findByAfishaId(target.id)}")
-    HallProjection getHall();
+    List<HallProjection> getHall();
 
-    @Value("#{@distributorRepository.getFindAllByAfishaId(target.id)}")
-    List<DistributorProjection> getDistributors();
 }

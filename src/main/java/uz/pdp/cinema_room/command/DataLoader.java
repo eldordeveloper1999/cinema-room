@@ -53,6 +53,10 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     SessionDateRepository sessionDateRepository;
 
+    @Autowired
+    UserRepository userRepository;
+
+
     @Override
     public void run(String... args) throws Exception {
 //        List<Hall> hallList = new ArrayList<>(Arrays.asList(
@@ -132,5 +136,11 @@ public class DataLoader implements CommandLineRunner {
 //        ));
 //
 //        sessionDateRepository.saveAll(sessionDates);
+
+//        User user = new User("Mark Twin", "mark", "1", "mark1@gmail.com", "+62266824");
+//
+//        userRepository.save(user);
     }
+
+
 }
