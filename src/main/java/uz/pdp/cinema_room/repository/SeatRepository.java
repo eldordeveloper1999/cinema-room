@@ -17,7 +17,8 @@ public interface SeatRepository extends JpaRepository<Seat, UUID> {
             "join reserved_halls rh on h.id = rh.hall_id\n" +
             "join afishalar a on a.id = rh.afisha_id\n" +
             "join session_times st on st.id = rh.end_time_id\n" +
-            "where rh.id = :uuid AND not s.id in (select t1.seat_id from tickets t1)")
+            "where rh.id = :uuid AND s.id not in (select t1.seat_id from tickets t1\n" +
+            "where t1.status = 'NEW' or t1.status = 'PURCHASED')")
     List<SeatProjection> findAvailableSeatsByRHId(UUID uuid);
 
 
