@@ -30,6 +30,10 @@ public class Ticket {
     @Column(nullable = false, updatable = false)
     private Timestamp createdAt;
 
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    private UUID serialNumber;
+
     @ManyToOne
     private ReservedHall reservedHall;
 

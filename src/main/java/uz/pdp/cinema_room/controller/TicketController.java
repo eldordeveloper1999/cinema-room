@@ -8,17 +8,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uz.pdp.cinema_room.api_response.ApiResponse;
-import uz.pdp.cinema_room.model.Cart;
-import uz.pdp.cinema_room.model.SpecialistType;
-import uz.pdp.cinema_room.model.Ticket;
-import uz.pdp.cinema_room.model.TicketStatus;
-import uz.pdp.cinema_room.repository.*;
-import uz.pdp.cinema_room.service.ReservedHallService;
-import uz.pdp.cinema_room.service.SeatService;
+import uz.pdp.cinema_room.model.*;
+import uz.pdp.cinema_room.projections.TicketProjection;
 import uz.pdp.cinema_room.service.TicketService;
-import uz.pdp.cinema_room.service.UserService;
 
-import javax.xml.ws.Action;
+import java.io.FileNotFoundException;
 import java.util.UUID;
 
 @RestController
@@ -29,58 +23,35 @@ public class TicketController {
     @Autowired
     TicketService ticketService;
 
-    @Autowired
-    CartRepository cartRepository;
-
-    @Autowired
-    UserService userService;
-
-    @Autowired
-    ReservedHallService reservedHallService;
-
-    @Autowired
-    SeatService seatService;
-
-    @Autowired
-    MovieRepository movieRepository;
-
-    @Autowired
-    HallRepository hallRepository;
-
-    @Autowired
-    PriceCategoryRepository priceCategoryRepository;
-
     @GetMapping("/{rh_id}/{seat_id}/{user_id}")
-    public HttpEntity getTicket(@PathVariable UUID rh_id,
-                                @PathVariable UUID seat_id,
-                                @PathVariable UUID user_id){
-        Cart cart = new Cart(null, userService.getUserById(user_id));
-        cartRepository.save(cart);
+    public ResponseEntity<ApiResponse> getTicket(@PathVariable UUID rh_id,
+                                                 @PathVariable UUID seat_id,
+                                                 @PathVariable UUID user_id) {
 
-        TicketStatus status = TicketStatus.getStatusByDisplayStatus("new");
+        UUID ticket_id = ticketService.saveTicket(user_id, rh_id, seat_id);
+        return ResponseEntity.ok(new ApiResponse(true, "success", ticketService.getTicket(ticket_id)));
+    }
 
-        Double initPrice = movieRepository.getPriceByRHId(rh_id);
-
-        Double priceSeat = priceCategoryRepository.getPrice(seat_id);
-
-        Double hallFee;
-
-        if(hallRepository.getFee(seat_id)!= null) {
-            hallFee = hallRepository.getFee(seat_id);
-        } else {
-            hallFee = 1.0;
+    @GetMapping("/buy/{ticket_id}")
+    public HttpEntity getPdfTicket(@PathVariable UUID ticket_id) {
+        Ticket ticket = ticketService.getTicketById(ticket_id);
+        try {
+            ticketService.generatePdfTicket(ticket_id);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
-
-        Double price = hallFee * initPrice + initPrice * priceSeat;
-
-        Ticket ticket = new Ticket();
-        ticket.setReservedHall(reservedHallService.getReservedHallById(rh_id));
-        ticket.setCart(cart);
-        ticket.setSeat(seatService.getSeatById(seat_id));
+        TicketStatus status = TicketStatus.getStatusByDisplayStatus("purchased");
         ticket.setStatus(status);
-        ticket.setPrice(price);
-        ticketService.saveTicket(ticket);
+        ticketService.updateTicket(ticket_id, ticket);
+        return ResponseEntity.ok("success");
+    }
 
+    @GetMapping("/refund/{ticket_id}")
+    public HttpEntity refundTicket(@PathVariable UUID ticket_id) {
+        Ticket ticket = ticketService.getTicketById(ticket_id);
+        TicketStatus status = TicketStatus.getStatusByDisplayStatus("refunded");
+        ticket.setStatus(status);
+        ticketService.updateTicket(ticket_id, ticket);
         return ResponseEntity.ok("success");
     }
 }
