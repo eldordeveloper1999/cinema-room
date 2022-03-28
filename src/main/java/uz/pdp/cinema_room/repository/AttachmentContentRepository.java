@@ -10,9 +10,7 @@ public interface AttachmentContentRepository extends JpaRepository<AttachmentCon
 
     AttachmentContent findByAttachmentId(UUID id);
 
-    @Query(nativeQuery = true, value = "select * from attachment_contents \n" +
-            "    join attachments a on a.id = attachment_contents.attachment_id\n" +
-            "join tickets t on a.id = t.qr_code_id\n" +
-            "where t.id = :ticket_id")
-    AttachmentContent getByTicketId(UUID ticket_id);
+    @Query(nativeQuery = true, value = "select * from attachment_contents \n"+
+            "where attachment_id = :id")
+    AttachmentContent getByAttachmentId(UUID id);
 }

@@ -34,4 +34,13 @@ public class PriceCategory extends AbsEntity {
         this.color = color;
     }
 
+
+    @Override
+    public String toString() {
+        return "PriceCategory{" +
+                "name='" + name + '\'' +
+                ", additional_fee_in_percentage=" + additional_fee_in_percentage +
+                ", color='" + color + '\'' +
+                '}';
+    }
 }

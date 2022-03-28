@@ -26,4 +26,8 @@ public class PurchaseWaitingTime {
     private UUID id;
 
     private Integer timeInMin;
+
+    public PurchaseWaitingTime(Integer timeInMin) {
+        this.timeInMin = timeInMin;
+    }
 }

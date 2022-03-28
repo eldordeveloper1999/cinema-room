@@ -12,7 +12,9 @@ import uz.pdp.cinema_room.model.*;
 import uz.pdp.cinema_room.projections.TicketProjection;
 import uz.pdp.cinema_room.service.TicketService;
 
+import javax.mail.MessagingException;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -42,7 +44,12 @@ public class TicketController {
         }
         TicketStatus status = TicketStatus.getStatusByDisplayStatus("purchased");
         ticket.setStatus(status);
-        ticketService.updateTicket(ticket_id, ticket);
+        UUID uuid = ticketService.updateTicket(ticket_id, ticket);
+        try {
+            ticketService.sendmail(uuid);
+        } catch (MessagingException | IOException e) {
+            e.printStackTrace();
+        }
         return ResponseEntity.ok("success");
     }
 
@@ -54,4 +61,5 @@ public class TicketController {
         ticketService.updateTicket(ticket_id, ticket);
         return ResponseEntity.ok("success");
     }
+
 }

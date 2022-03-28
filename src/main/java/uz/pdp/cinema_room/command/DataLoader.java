@@ -36,6 +36,9 @@ public class DataLoader implements CommandLineRunner {
     AttachmentRepository attachmentRepository;
 
     @Autowired
+    PurchaseWaitingTimeRepository purchaseWaitingTimeRepository;
+
+    @Autowired
     DistributorRepository distributorRepository;
 
     @Autowired
@@ -140,6 +143,10 @@ public class DataLoader implements CommandLineRunner {
 //        User user = new User("Mark Twin", "mark", "1", "mark1@gmail.com", "+62266824");
 //
 //        userRepository.save(user);
+
+//        PurchaseWaitingTime purchaseWaitingTime = new PurchaseWaitingTime(30);
+//
+//        purchaseWaitingTimeRepository.save(purchaseWaitingTime);
     }
 
 
