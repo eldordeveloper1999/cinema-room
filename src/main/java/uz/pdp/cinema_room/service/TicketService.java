@@ -5,22 +5,23 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Cell;
-import com.itextpdf.layout.element.IBlockElement;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.TextAlignment;
 import net.glxn.qrgen.javase.QRCode;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import uz.pdp.cinema_room.model.*;
 import uz.pdp.cinema_room.projections.TicketProjection;
 import uz.pdp.cinema_room.repository.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.util.UUID;
+import javax.mail.*;
+import javax.mail.internet.*;
+import java.io.*;
+import java.util.*;
 
 import static java.time.LocalTime.now;
 
@@ -52,6 +53,9 @@ public class TicketService {
     PriceCategoryRepository priceCategoryRepository;
 
     @Autowired
+    PurchaseWaitingTimeRepository purchaseWaitingTimeRepository;
+
+    @Autowired
     AttachmentRepository attachmentRepo;
 
     @Autowired
@@ -76,9 +80,12 @@ public class TicketService {
 
         Double hallFee = hallRepository.getFee(seat_id);
 
-
-        Double price = (hallFee * initPrice)/100 + (initPrice * priceSeat)/100;
-
+        double price;
+        if (hallFee != null) {
+            price = (hallFee * initPrice) / 100 + (initPrice * priceSeat) / 100;
+        } else {
+            price = (initPrice * priceSeat) / 100;
+        }
         Ticket ticket = new Ticket();
 
         ticket.setReservedHall(reservedHallService.getReservedHallById(rh_id));
@@ -114,9 +121,68 @@ public class TicketService {
         ticket.setQr_code(savedFile);
         ticketRepository.save(ticket);
 
+        Integer waitingMinute = purchaseWaitingTimeRepository.getWaitingMinute();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                Ticket ticketByIdForCart = ticketRepository.getTicketBYId(ticket.getId());
+                try {
+                    if (ticketByIdForCart.getStatus().equals(TicketStatus.NEW)) {
+                        ticketRepository.deleteById(ticket.getId());
+                        System.out.println("Ticket is deleted " + ticket.getId());
+                    }
+                } catch (NullPointerException ignored) {
+                }
+            }
+        };
+        Timer timer = new Timer();
+        System.out.println("after " + waitingMinute + " minutes ticket will be deleted!");
+        timer.schedule(timerTask, waitingMinute * 60000);
         return ticket.getId();
     }
 
+
+    public void sendmail(UUID ticket_id) throws AddressException, MessagingException, IOException {
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+
+        Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication("ch.eldor1999@gmail.com", "choriyev1007");
+            }
+        });
+        Message msg = new MimeMessage(session);
+        msg.setFrom(new InternetAddress("ch.eldor1999@gmail.com", false));
+
+        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse("eldordeveloper1999@gmail.com"));
+        msg.setSubject("Cinema room email");
+        msg.setContent("Cinema room email", "text/html");
+        msg.setSentDate(new Date());
+
+        MimeBodyPart messageBodyPart = new MimeBodyPart();
+        messageBodyPart.setContent("Cinema room email", "text/html");
+
+        Multipart multipart = new MimeMultipart();
+        multipart.addBodyPart(messageBodyPart);
+        MimeBodyPart attachPart = new MimeBodyPart();
+//
+//        Ticket ticketById = ticketRepository.getTicketBYId(ticket_id);
+//
+//        UUID qr_code_id = ticketById.getQr_code().getId();
+//
+//        Attachment attachment = attachmentRepo.getByTicketId(qr_code_id);
+//
+//        AttachmentContent attachmentContent = attachmentContentRepo.getByAttachmentId(attachment.getId());
+//
+//        byte[] data = attachmentContent.getData();
+        attachPart.attachFile(generatePdfTicket(ticket_id));
+        multipart.addBodyPart(attachPart);
+        msg.setContent(multipart);
+        Transport.send(msg);
+    }
 
     public static byte[] generateQRCodeImage(String qrcodeText) throws Exception {
         ByteArrayOutputStream stream = QRCode
@@ -128,22 +194,19 @@ public class TicketService {
     }
 
 
-    public void updateTicket(UUID ticketId, Ticket ticketData) {
+    public UUID updateTicket(UUID ticketId, Ticket ticket) {
         ticketRepository.deleteById(ticketId);
-        ticketRepository.save(ticketData);
+        Ticket save = ticketRepository.save(ticket);
+        return save.getId();
     }
 
-
-    @Scheduled()
-    public void deleteTicket(UUID ticketId) {
-        ticketRepository.deleteById(ticketId);
-    }
-
-    public Document generatePdfTicket(UUID ticket_id) throws FileNotFoundException {
+    public String generatePdfTicket(UUID ticket_id) throws FileNotFoundException {
+        final String imgDirectory = "./src/main/resources/static/";
 
         TicketProjection ticketById = ticketRepository.getTicketById(ticket_id);
 
-        PdfWriter writer = new PdfWriter(new FileOutputStream("Ticket.pdf"));
+        String imgLocation = imgDirectory + "Ticket.pdf";
+        PdfWriter writer = new PdfWriter(new FileOutputStream(imgLocation));
         PdfDocument pdfDocument = new PdfDocument(writer);
 
         pdfDocument.setDefaultPageSize(PageSize.A4);
@@ -170,10 +233,15 @@ public class TicketService {
 //        document.add((IBlockElement) attachment);
         document.close();
 
-        return document;
+        return imgLocation;
+    }
+
+
+    public void deleteTicket(UUID ticketId) {
+        ticketRepository.deleteById(ticketId);
     }
 
     public Ticket getTicketById(UUID ticket_id) {
-        return ticketRepository.getById(ticket_id);
+        return ticketRepository.getTicketBYId(ticket_id);
     }
 }
