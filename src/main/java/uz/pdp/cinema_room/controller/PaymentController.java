@@ -6,6 +6,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uz.pdp.cinema_room.dto.TicketDto;
 import uz.pdp.cinema_room.model.Ticket;
@@ -49,6 +50,16 @@ public class PaymentController {
         ticketDto.setMovieTitle(ticketRepository.getMovieTitle(ticket_id));
         ticketDto.setUser_id(ticketRepository.getUserId(ticket_id));
         return ticketDto;
+    }
+
+    @RequestMapping(value = "/payment/success")
+    public HttpEntity getSuccessMessage() {
+        return ResponseEntity.ok("payment successfully");
+    }
+
+    @RequestMapping(value = "/payment/cancel")
+    public HttpEntity getCancelMessage() {
+        return ResponseEntity.ok("payment successfully");
     }
 
 }
