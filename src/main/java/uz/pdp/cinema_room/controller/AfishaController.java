@@ -41,7 +41,7 @@ public class AfishaController {
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "2") int size
     ) {
-        Pageable paging =  PageRequest.of(page, size);
+        Pageable paging = PageRequest.of(page, size);
         Page<AfishaProjection> movies = afishaService.afishaList(paging);
 
         ApiResponse res = new ApiResponse(true, "success", movies);

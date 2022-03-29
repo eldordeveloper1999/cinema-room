@@ -37,8 +37,9 @@ public class TicketController {
     @GetMapping("/buy/{ticket_id}")
     public HttpEntity getPdfTicket(@PathVariable UUID ticket_id) {
         Ticket ticket = ticketService.getTicketById(ticket_id);
+        String pdfTicketUrl = null;
         try {
-            ticketService.generatePdfTicket(ticket_id);
+            pdfTicketUrl = ticketService.generatePdfTicket(ticket_id);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -46,7 +47,7 @@ public class TicketController {
         ticket.setStatus(status);
         UUID uuid = ticketService.updateTicket(ticket_id, ticket);
         try {
-            ticketService.sendmail(uuid);
+            ticketService.sendmail(uuid, pdfTicketUrl);
         } catch (MessagingException | IOException e) {
             e.printStackTrace();
         }
