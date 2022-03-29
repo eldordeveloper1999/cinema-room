@@ -1,5 +1,8 @@
 package uz.pdp.cinema_room.service;
 
+import com.itextpdf.io.image.ImageData;
+import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.layout.element.Image;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
@@ -142,7 +145,7 @@ public class TicketService {
     }
 
 
-    public void sendmail(UUID ticket_id) throws AddressException, MessagingException, IOException {
+    public void sendmail(UUID ticket_id, String pdfUrl) throws AddressException, MessagingException, IOException {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -158,7 +161,7 @@ public class TicketService {
         msg.setFrom(new InternetAddress("ch.eldor1999@gmail.com", false));
 
         msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse("eldordeveloper1999@gmail.com"));
-        msg.setSubject("Cinema room email");
+        msg.setSubject("Dear Client");
         msg.setContent("Cinema room email", "text/html");
         msg.setSentDate(new Date());
 
@@ -168,17 +171,7 @@ public class TicketService {
         Multipart multipart = new MimeMultipart();
         multipart.addBodyPart(messageBodyPart);
         MimeBodyPart attachPart = new MimeBodyPart();
-//
-//        Ticket ticketById = ticketRepository.getTicketBYId(ticket_id);
-//
-//        UUID qr_code_id = ticketById.getQr_code().getId();
-//
-//        Attachment attachment = attachmentRepo.getByTicketId(qr_code_id);
-//
-//        AttachmentContent attachmentContent = attachmentContentRepo.getByAttachmentId(attachment.getId());
-//
-//        byte[] data = attachmentContent.getData();
-        attachPart.attachFile(generatePdfTicket(ticket_id));
+        attachPart.attachFile(pdfUrl);
         multipart.addBodyPart(attachPart);
         msg.setContent(multipart);
         Transport.send(msg);
@@ -189,7 +182,6 @@ public class TicketService {
                 .from(qrcodeText)
                 .withSize(250, 250)
                 .stream();
-//        ByteArrayInputStream bis = new ByteArrayInputStream(stream.toByteArray());
         return stream.toByteArray();
     }
 
@@ -203,7 +195,7 @@ public class TicketService {
     public String generatePdfTicket(UUID ticket_id) throws FileNotFoundException {
         final String imgDirectory = "./src/main/resources/static/";
 
-        TicketProjection ticketById = ticketRepository.getTicketById(ticket_id);
+        Ticket ticket = ticketRepository.getTicketBYId(ticket_id);
 
         String imgLocation = imgDirectory + "Ticket.pdf";
         PdfWriter writer = new PdfWriter(new FileOutputStream(imgLocation));
@@ -222,15 +214,20 @@ public class TicketService {
         float[] pointColumn = {60F, 120F, 120F, 120F, 120F};
         Table table = new Table(pointColumn);
         table.setTextAlignment(TextAlignment.CENTER).setHorizontalAlignment(com.itextpdf.layout.property.HorizontalAlignment.CENTER);
-        table.addCell(new Cell().add("" + ticketById.getId()));
-        table.addCell(new Cell().add("" + ticketById.getPrice()));
+        table.addCell(new Cell().add("" + ticket.getId()));
+        table.addCell(new Cell().add("" + ticket.getPrice()));
 //        table.addCell(new Cell().add("" + ticketById.getSeat()));
         document.add(table);
 
-//        AttachmentContent file = attachmentContentRepo.getByTicketId(ticket_id);
-//        Attachment attachment = file.getAttachment();
-//
-//        document.add((IBlockElement) attachment);
+
+        AttachmentContent file = attachmentContentRepo.getByAttachmentId(ticket.getQr_code().getId());
+
+        ImageData imageData = ImageDataFactory.create(file.getData());
+
+        Image img = new Image(imageData);
+
+        // Creating Image object from the imagedata
+        document.add(img);
         document.close();
 
         return imgLocation;
