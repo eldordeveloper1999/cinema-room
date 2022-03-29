@@ -25,7 +25,7 @@ public class PaymentServiceImpl implements PaymentService{
     String baseUrl;
 
     @Override
-    public HttpEntity createStripeSession(List<TicketDto> ticketDtoList) throws StripeException {
+    public HttpEntity createStripeSession(TicketDto ticketDto) throws StripeException {
         // SUCCESS and FAILURE URLS
         String successURL = baseUrl + "payment/success";
         String failureURL = baseUrl + "payment/failed";
@@ -34,9 +34,9 @@ public class PaymentServiceImpl implements PaymentService{
 
         List<SessionCreateParams.LineItem> sessionItemList = new ArrayList<>();
 
-        for (TicketDto ticketDto : ticketDtoList) {
+//        for (TicketDto ticketDto : ticketDtoList) {
             sessionItemList.add(createSessionLineItem(ticketDto));
-        }
+//        }
 
         SessionCreateParams params = SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
@@ -49,8 +49,7 @@ public class PaymentServiceImpl implements PaymentService{
         Session session = Session.create(params);
 
         StripeResponseDto stripeResponse = new StripeResponseDto(session.getId());
-        return ResponseEntity.ok(stripeResponse);
-
+        return ResponseEntity.ok(session.getUrl());
     }
 
     private SessionCreateParams.LineItem createSessionLineItem(TicketDto ticketDto) {

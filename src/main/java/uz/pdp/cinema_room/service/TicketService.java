@@ -182,7 +182,6 @@ public class TicketService {
                 .from(qrcodeText)
                 .withSize(250, 250)
                 .stream();
-//        ByteArrayInputStream bis = new ByteArrayInputStream(stream.toByteArray());
         return stream.toByteArray();
     }
 
