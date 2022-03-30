@@ -85,9 +85,9 @@ public class TicketService {
 
         double price;
         if (hallFee != null) {
-            price = (hallFee * initPrice) / 100 + (initPrice * priceSeat) / 100;
+            price = (hallFee * initPrice) / 100 + (initPrice * priceSeat) / 100 + initPrice;
         } else {
-            price = (initPrice * priceSeat) / 100;
+            price = (initPrice * priceSeat) / 100 + initPrice;
         }
         Ticket ticket = new Ticket();
 
@@ -185,12 +185,6 @@ public class TicketService {
         return stream.toByteArray();
     }
 
-    public UUID updateTicket(UUID ticketId, Ticket ticket) {
-        ticketRepository.deleteById(ticketId);
-        Ticket save = ticketRepository.save(ticket);
-        return save.getId();
-    }
-
     public String generatePdfTicket(UUID ticket_id) throws FileNotFoundException {
         final String imgDirectory = "./src/main/resources/static/";
 
@@ -231,7 +225,6 @@ public class TicketService {
 
         return imgLocation;
     }
-
 
     public void deleteTicket(UUID ticketId) {
         ticketRepository.deleteById(ticketId);

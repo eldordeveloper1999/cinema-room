@@ -25,7 +25,7 @@ public class PaymentServiceImpl implements PaymentService{
     String baseUrl;
 
     @Override
-    public HttpEntity createStripeSession(TicketDto ticketDto) throws StripeException {
+    public HttpEntity createStripeSession(List<TicketDto> ticketDtoList) throws StripeException {
         // SUCCESS and FAILURE URLS
         String successURL = baseUrl + "payment/success";
         String failureURL = baseUrl + "payment/failed";
@@ -34,14 +34,14 @@ public class PaymentServiceImpl implements PaymentService{
 
         List<SessionCreateParams.LineItem> sessionItemList = new ArrayList<>();
 
-//        for (TicketDto ticketDto : ticketDtoList) {
+        for (TicketDto ticketDto : ticketDtoList) {
             sessionItemList.add(createSessionLineItem(ticketDto));
-//        }
+        }
 
         SessionCreateParams params = SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setClientReferenceId(ticketDto.getUser_id().toString())
+                .setClientReferenceId(ticketDtoList.get(0).getUser_id().toString())
                 .setCancelUrl(failureURL)
                 .setSuccessUrl(successURL)
                 .addAllLineItem(sessionItemList)
@@ -61,13 +61,16 @@ public class PaymentServiceImpl implements PaymentService{
     }
 
     private SessionCreateParams.LineItem.PriceData createPriceData(TicketDto ticketDto) {
+        double amount = ((ticketDto.getPrice() * 100) + 30) / (0.971);
+
         return SessionCreateParams.LineItem.PriceData.builder()
                 .setCurrency("usd")
-                .setUnitAmount((long) ticketDto.getPrice() * 100)
+                .setUnitAmount((long) amount)
                 .setProductData(SessionCreateParams.LineItem.PriceData.ProductData.builder()
                         .setName(ticketDto.getMovieTitle())
                         .build())
                 .build();
     }
+
 
 }

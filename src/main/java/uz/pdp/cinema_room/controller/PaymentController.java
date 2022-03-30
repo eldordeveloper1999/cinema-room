@@ -11,10 +11,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.cinema_room.dto.TicketDto;
-import uz.pdp.cinema_room.model.PayType;
-import uz.pdp.cinema_room.model.PurchaseHistory;
-import uz.pdp.cinema_room.model.Ticket;
-import uz.pdp.cinema_room.model.User;
+import uz.pdp.cinema_room.model.*;
 import uz.pdp.cinema_room.repository.PayTypeRepository;
 import uz.pdp.cinema_room.repository.PurchaseHistoryRepository;
 import uz.pdp.cinema_room.repository.TicketRepository;
@@ -22,6 +19,7 @@ import uz.pdp.cinema_room.repository.UserRepository;
 import uz.pdp.cinema_room.service.PaymentServiceImpl;
 import uz.pdp.cinema_room.service.TicketService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -52,28 +50,33 @@ public class PaymentController {
 
     private final String endpointSecret = "whsec_7ff3b46b29bf0ec53804d240f2dd205956f1647a5efbfd8053b106972359a248";
 
-    @PostMapping("/create-checkout-session/{ticket_id}")
-    public HttpEntity getCreateCheckoutSession(@PathVariable UUID ticket_id) {
-        Ticket ticketBYId = ticketRepository.getTicketBYId(ticket_id);
+    @PostMapping("/create-checkout-session")
+    public HttpEntity getCreateCheckoutSession() {
 
-        TicketDto ticketDto = getTicketDto(ticket_id, ticketBYId);
+        List<Ticket> allByUserId = ticketRepository.findAllByUserId(UUID.fromString("629a3524-7018-4f58-ad8e-0a1027de5f2c"));
+        
+        List<TicketDto> ticketDtoList = getTicketDtos(allByUserId);
 
         try {
-            return paymentService.createStripeSession(ticketDto);
+            return paymentService.createStripeSession(ticketDtoList);
         } catch (StripeException e) {
             e.printStackTrace();
         }
         return ResponseEntity.EMPTY;
     }
 
-    private TicketDto getTicketDto(UUID ticket_id, Ticket ticketBYId) {
-        TicketDto ticketDto = new TicketDto();
-        ticketDto.setPrice(ticketBYId.getPrice());
-        ticketDto.setReservedHall_id(ticketBYId.getReservedHall().getId());
-        ticketDto.setSeat_id(ticketBYId.getSeat().getId());
-        ticketDto.setMovieTitle(ticketRepository.getMovieTitle(ticket_id));
-        ticketDto.setUser_id(ticketRepository.getUserId(ticket_id));
-        return ticketDto;
+    private List<TicketDto> getTicketDtos(List<Ticket> ticketBYId) {
+        List<TicketDto> ticketDtoList = new ArrayList<>();
+        for (Ticket ticket : ticketBYId) {
+            TicketDto ticketDto = new TicketDto();
+            ticketDto.setPrice(ticket.getPrice());
+            ticketDto.setReservedHall_id(ticket.getReservedHall().getId());
+            ticketDto.setSeat_id(ticket.getSeat().getId());
+            ticketDto.setMovieTitle(ticketRepository.getMovieTitle(ticket.getId()));
+            ticketDto.setUser_id(ticketRepository.getUserId(ticket.getId()));
+            ticketDtoList.add(ticketDto);
+        }
+        return ticketDtoList;
     }
 
     @RequestMapping(value = "/payment/success")
@@ -116,11 +119,13 @@ public class PaymentController {
         PayType payType = payTypeRepository.findByName("Stripe");
         List<Ticket> allByUserId = ticketRepository.findAllByUserId(UUID.fromString(session.getClientReferenceId()));
         for (Ticket ticket : allByUserId) {
-            UUID uuid = ticketService.updateTicket(ticket.getId(), ticket);
+            TicketStatus status = TicketStatus.getStatusByDisplayStatus("purchased");
+            ticket.setStatus(status);
+            ticketRepository.save(ticket);
             PurchaseHistory purchaseHistory = new PurchaseHistory(
                     null,
                     user,
-                    ticketRepository.getTicketBYId(uuid),
+                    ticket,
                     payType
             );
             purchaseHistoryRepository.save(purchaseHistory);
@@ -131,13 +136,5 @@ public class PaymentController {
 
         System.out.println("Current User ID: " + session.getClientReferenceId());
     }
-//    @RequestMapping(value = "stripe-webhook", method = RequestMethod.POST)
-//    public Object handle(@RequestBody String payload) {
-//
-//        System.out.println("Got payload: " + payload);
-//
-////        response.status(200);
-//        return "";
-//
-//    }
+
 }

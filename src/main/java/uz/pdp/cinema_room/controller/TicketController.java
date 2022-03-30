@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uz.pdp.cinema_room.api_response.ApiResponse;
 import uz.pdp.cinema_room.model.*;
 import uz.pdp.cinema_room.projections.TicketProjection;
+import uz.pdp.cinema_room.repository.TicketRepository;
 import uz.pdp.cinema_room.service.TicketService;
 
 import javax.mail.MessagingException;
@@ -24,6 +25,9 @@ public class TicketController {
 
     @Autowired
     TicketService ticketService;
+
+    @Autowired
+    TicketRepository ticketRepository;
 
     @GetMapping("/{rh_id}/{seat_id}/{user_id}")
     public ResponseEntity<ApiResponse> getTicket(@PathVariable UUID rh_id,
@@ -45,9 +49,9 @@ public class TicketController {
         }
         TicketStatus status = TicketStatus.getStatusByDisplayStatus("purchased");
         ticket.setStatus(status);
-        UUID uuid = ticketService.updateTicket(ticket_id, ticket);
+        ticketRepository.save(ticket);
         try {
-            ticketService.sendmail(uuid, pdfTicketUrl);
+            ticketService.sendmail(ticket.getId(), pdfTicketUrl);
         } catch (MessagingException | IOException e) {
             e.printStackTrace();
         }
@@ -59,7 +63,7 @@ public class TicketController {
         Ticket ticket = ticketService.getTicketById(ticket_id);
         TicketStatus status = TicketStatus.getStatusByDisplayStatus("refunded");
         ticket.setStatus(status);
-        ticketService.updateTicket(ticket_id, ticket);
+        ticketRepository.save(ticket);
         return ResponseEntity.ok("success");
     }
 
