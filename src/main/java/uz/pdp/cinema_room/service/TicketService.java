@@ -185,7 +185,6 @@ public class TicketService {
         return stream.toByteArray();
     }
 
-
     public UUID updateTicket(UUID ticketId, Ticket ticket) {
         ticketRepository.deleteById(ticketId);
         Ticket save = ticketRepository.save(ticket);

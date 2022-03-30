@@ -3,6 +3,7 @@ package uz.pdp.cinema_room.command;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Component;
 import uz.pdp.cinema_room.model.*;
 import uz.pdp.cinema_room.repository.*;
@@ -59,6 +60,8 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    PayTypeRepository payTypeRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -147,6 +150,10 @@ public class DataLoader implements CommandLineRunner {
 //        PurchaseWaitingTime purchaseWaitingTime = new PurchaseWaitingTime(30);
 //
 //        purchaseWaitingTimeRepository.save(purchaseWaitingTime);
+
+//        PayType payType = new PayType(null, "Stripe", null);
+//
+//        payTypeRepository.save(payType);
     }
 
 
