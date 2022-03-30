@@ -8,6 +8,7 @@ import uz.pdp.cinema_room.model.Ticket;
 import uz.pdp.cinema_room.model.TicketStatus;
 import uz.pdp.cinema_room.projections.TicketProjection;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,4 +53,11 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
             "join users u on u.id = c.user_id\n" +
             "where u.id = :Id and status = 'NEW'")
     List<Ticket> findAllByUserId(UUID Id);
+
+
+    @Query(nativeQuery = true, value = "select count(*) from tickets\n" +
+            "join reserved_halls rh on rh.id = tickets.reserved_hall_id\n" +
+            "join session_dates sd on sd.id = rh.session_date_id\n" +
+            "where status = 'PURCHASED' and sd.date = :date")
+    Integer getTicketsByDate(LocalDate date);
 }

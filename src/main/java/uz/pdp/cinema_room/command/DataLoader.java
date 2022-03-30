@@ -138,7 +138,7 @@ public class DataLoader implements CommandLineRunner {
 //        sessionTimeRepository.saveAll(sessionTimes);
 
 //        List<SessionDate> sessionDates = new ArrayList<>(Arrays.asList(
-//                new SessionDate(LocalDate.of(2022, 03, 20))
+//                new SessionDate(LocalDate.of(2022, 03, 21))
 //        ));
 //
 //        sessionDateRepository.saveAll(sessionDates);

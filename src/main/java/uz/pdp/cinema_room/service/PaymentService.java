@@ -7,5 +7,5 @@ import uz.pdp.cinema_room.dto.TicketDto;
 import java.util.List;
 
 public interface PaymentService {
-    HttpEntity createStripeSession(TicketDto ticketDto) throws StripeException;
+    HttpEntity createStripeSession(List<TicketDto> ticketDto) throws StripeException;
 }
