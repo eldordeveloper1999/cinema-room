@@ -41,6 +41,7 @@ public class PaymentServiceImpl implements PaymentService{
         SessionCreateParams params = SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
+                .setClientReferenceId(ticketDto.getUser_id().toString())
                 .setCancelUrl(failureURL)
                 .setSuccessUrl(successURL)
                 .addAllLineItem(sessionItemList)

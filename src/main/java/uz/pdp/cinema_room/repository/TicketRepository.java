@@ -8,6 +8,7 @@ import uz.pdp.cinema_room.model.Ticket;
 import uz.pdp.cinema_room.model.TicketStatus;
 import uz.pdp.cinema_room.projections.TicketProjection;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -45,4 +46,10 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
             "join movies m on m.id = a.movie_id" +
             " where tickets.id = :id")
     UUID getUserId(UUID id);
+
+    @Query(nativeQuery = true, value = "select * from tickets\n" +
+            "    join carts c on c.id = tickets.cart_id\n" +
+            "join users u on u.id = c.user_id\n" +
+            "where u.id = :Id and status = 'NEW'")
+    List<Ticket> findAllByUserId(UUID Id);
 }
