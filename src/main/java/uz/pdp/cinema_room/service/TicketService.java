@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import uz.pdp.cinema_room.model.*;
+import uz.pdp.cinema_room.projections.PdfWriterProjection;
 import uz.pdp.cinema_room.projections.TicketProjection;
 import uz.pdp.cinema_room.repository.*;
 
@@ -185,7 +186,7 @@ public class TicketService {
         return stream.toByteArray();
     }
 
-    public String generatePdfTicket(UUID ticket_id) throws FileNotFoundException {
+    public String generatePdfTicket(UUID ticket_id) throws Exception {
         final String imgDirectory = "./src/main/resources/static/";
 
         Ticket ticket = ticketRepository.getTicketBYId(ticket_id);
@@ -203,23 +204,17 @@ public class TicketService {
 
         document.add(paragraph);
 
+        PdfWriterProjection projection = ticketRepository.getTicketPdfProjection(ticket_id);
+        document.add(new Paragraph("Movie:  " + projection.getMovieName()));
+        document.add(new Paragraph("Hall:   " + projection.getHall()));
+        document.add(new Paragraph("Row:    " + projection.getRow()));
+        document.add(new Paragraph("Seat:   " + projection.getSeat()));
+        document.add(new Paragraph("Team:   " + projection.getTime()));
 
-        float[] pointColumn = {60F, 120F, 120F, 120F, 120F};
-        Table table = new Table(pointColumn);
-        table.setTextAlignment(TextAlignment.CENTER).setHorizontalAlignment(com.itextpdf.layout.property.HorizontalAlignment.CENTER);
-        table.addCell(new Cell().add("" + ticket.getId()));
-        table.addCell(new Cell().add("" + ticket.getPrice()));
-//        table.addCell(new Cell().add("" + ticketById.getSeat()));
-        document.add(table);
-
-
-        AttachmentContent file = attachmentContentRepo.getByAttachmentId(ticket.getQr_code().getId());
-
-        ImageData imageData = ImageDataFactory.create(file.getData());
+        byte[] bytes = generateQRCodeImage(String.valueOf(ticket.getSerialNumber()));
+        ImageData imageData = ImageDataFactory.create(bytes);
 
         Image img = new Image(imageData);
-
-        // Creating Image object from the imagedata
         document.add(img);
         document.close();
 
