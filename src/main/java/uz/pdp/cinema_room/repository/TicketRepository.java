@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import uz.pdp.cinema_room.dto.TicketDto;
 import uz.pdp.cinema_room.model.Ticket;
 import uz.pdp.cinema_room.model.TicketStatus;
+import uz.pdp.cinema_room.projections.PdfWriterProjection;
 import uz.pdp.cinema_room.projections.TicketProjection;
 
 import java.time.LocalDate;
@@ -60,4 +61,19 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
             "join session_dates sd on sd.id = rh.session_date_id\n" +
             "where status = 'PURCHASED' and sd.date = :date")
     Integer getTicketsByDate(LocalDate date);
+
+    @Query(nativeQuery = true, value = "select s.number as seat, " +
+            "r.number as row, " +
+            "h.name as hall, " +
+            "st.time as time, " +
+            "m.title as movieName from tickets t\n" +
+            "join seats s on t.seat_id = s.id\n" +
+            "join \"rows\" r on r.id = s.row_id\n" +
+            "join reserved_halls rh on rh.id = t.reserved_hall_id\n" +
+            "join halls h on h.id = rh.hall_id\n" +
+            "join session_times st on st.id = rh.end_time_id\n" +
+            "join afishalar a on a.id = rh.afisha_id\n" +
+            "join movies m on m.id = a.movie_id\n" +
+            "where t.id = :ticket_id")
+    PdfWriterProjection getTicketPdfProjection(UUID ticket_id);
 }

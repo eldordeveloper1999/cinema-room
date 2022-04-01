@@ -44,7 +44,7 @@ public class TicketController {
         String pdfTicketUrl = null;
         try {
             pdfTicketUrl = ticketService.generatePdfTicket(ticket_id);
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         TicketStatus status = TicketStatus.getStatusByDisplayStatus("purchased");

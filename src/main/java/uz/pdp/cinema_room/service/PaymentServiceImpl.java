@@ -2,7 +2,9 @@ package uz.pdp.cinema_room.service;
 
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
+import com.stripe.model.Refund;
 import com.stripe.model.checkout.Session;
+import com.stripe.param.RefundCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -15,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class PaymentServiceImpl implements PaymentService{
+public class PaymentServiceImpl implements PaymentService {
 
 
     @Value("${STRIPE_SECRET_KEY}")
@@ -72,5 +74,19 @@ public class PaymentServiceImpl implements PaymentService{
                 .build();
     }
 
-
+    public boolean refundTicket(String paymentIntent, Double refundSum) {
+        try {
+            Stripe.apiKey = stripeApiKey;
+            RefundCreateParams params = RefundCreateParams
+                    .builder()
+                    .setPaymentIntent(paymentIntent)
+                    .setAmount(refundSum.longValue())
+                    .build();
+            Refund refund = Refund.create(params);
+            return refund.getStatus().equals("succeeded");
+        } catch (StripeException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
