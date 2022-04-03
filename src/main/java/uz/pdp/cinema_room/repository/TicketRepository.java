@@ -10,6 +10,7 @@ import uz.pdp.cinema_room.projections.PdfWriterProjection;
 import uz.pdp.cinema_room.projections.TicketProjection;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -76,4 +77,18 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
             "join movies m on m.id = a.movie_id\n" +
             "where t.id = :ticket_id")
     PdfWriterProjection getTicketPdfProjection(UUID ticket_id);
+
+
+    @Query(nativeQuery = true, value = "select distinct sd.date from tickets t \n" +
+            "join reserved_halls rh on rh.id = t.reserved_hall_id\n" +
+            "join session_dates sd on sd.id = rh.session_date_id\n" +
+            "where t.id =  :ticket_id")
+    LocalDate getSessionDateForRefundTicket(UUID ticket_id);
+
+
+    @Query(nativeQuery = true, value = "select st.time from tickets t " +
+            "join reserved_halls rh on rh.id = t.reserved_hall_id " +
+            "join session_times st on st.id = rh.end_time_id" +
+            " where  t.id = :id")
+    LocalTime getSessionTime(UUID id);
 }

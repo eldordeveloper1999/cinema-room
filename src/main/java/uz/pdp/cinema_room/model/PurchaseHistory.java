@@ -35,4 +35,7 @@ public class PurchaseHistory {
     @ManyToOne
     private PayType payType;
 
+    private boolean isRefunded = false;
+
+    private String stripePaymentIntent;
 }

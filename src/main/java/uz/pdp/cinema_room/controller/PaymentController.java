@@ -19,10 +19,8 @@ import uz.pdp.cinema_room.repository.UserRepository;
 import uz.pdp.cinema_room.service.PaymentServiceImpl;
 import uz.pdp.cinema_room.service.TicketService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.*;
+import java.util.*;
 
 @RestController
 public class PaymentController {
@@ -126,15 +124,40 @@ public class PaymentController {
                     null,
                     user,
                     ticket,
-                    payType
+                    payType,
+                    false,
+                    session.getPaymentIntent()
             );
             purchaseHistoryRepository.save(purchaseHistory);
-        }
-        // TODO: 3/29/2022 TICKET STATUSLARINI PURCHASEDGA
-        //  UZGARTIRISH VA PURCHASED BULGAN TICKETLARNI
-        //  PURCHASE HISTORYGA YOZISH
+            LocalDate date = ticketRepository.getSessionDateForRefundTicket(ticket.getId());
+            LocalTime time = ticketRepository.getSessionTime(ticket.getId());
+            TimerTask timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    try {
+                        String s = ticketService.generatePdfTicket(ticket.getId());
+                        ticketService.sendmail(ticket.getId(), s);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            Timer timer = new Timer();
 
+            LocalDateTime localDateTime = date.atTime(time);
+
+            Duration duration = Duration.between(LocalDateTime.now(), localDateTime);
+
+            long l = duration.toMinutes();
+            timer.schedule(timerTask, (l - 68) * 60000);
+            System.out.println("after " + (l-69) + " minutes email will be sendee!");
+        }
         System.out.println("Current User ID: " + session.getClientReferenceId());
+    }
+
+    @PostMapping("/refund")
+    public HttpEntity refundTickets(@RequestParam("id") UUID id){
+        return paymentService.refundTicket(id);
     }
 
 }
