@@ -6,15 +6,26 @@ import com.stripe.model.Refund;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.RefundCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uz.pdp.cinema_room.dto.StripeResponseDto;
 import uz.pdp.cinema_room.dto.TicketDto;
+import uz.pdp.cinema_room.model.PurchaseHistory;
+import uz.pdp.cinema_room.model.Ticket;
+import uz.pdp.cinema_room.model.TicketStatus;
+import uz.pdp.cinema_room.repository.PurchaseHistoryRepository;
+import uz.pdp.cinema_room.repository.PurchaseWaitingTimeRepository;
+import uz.pdp.cinema_room.repository.TicketRepository;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -25,6 +36,12 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Value("${BASE_URL}")
     String baseUrl;
+
+    @Autowired
+    PurchaseHistoryRepository purchaseHistoryRepository;
+
+    @Autowired
+    TicketRepository ticketRepository;
 
     @Override
     public HttpEntity createStripeSession(List<TicketDto> ticketDtoList) throws StripeException {
@@ -74,19 +91,66 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
     }
 
-    public boolean refundTicket(String paymentIntent, Double refundSum) {
+//    public boolean refundTicket(String paymentIntent, Double refundSum) {
+//        try {
+//            Stripe.apiKey = stripeApiKey;
+//            RefundCreateParams params = RefundCreateParams
+//                    .builder()
+//                    .setPaymentIntent(paymentIntent)
+//                    .setAmount(refundSum.longValue())
+//                    .build();
+//            Refund refund = Refund.create(params);
+//            return refund.getStatus().equals("succeeded");
+//        } catch (StripeException e) {
+//            e.printStackTrace();
+//            return false;
+//        }
+//    }
+
+    public HttpEntity refundTicket(UUID ticket_id) {
+
+
+        PurchaseHistory purchaseHistory = purchaseHistoryRepository.findByTicketId(ticket_id);
+
+        String stripePaymentIntent = purchaseHistory.getStripePaymentIntent();
+
+        Ticket ticket= ticketRepository.getTicketBYId(ticket_id);
+
+        LocalDate sessionDate = ticketRepository.getSessionDateForRefundTicket(ticket_id);
+
+        Period period = Period.between(LocalDate.now(), sessionDate);
+        double refundSum;
+        if (period.getDays() <= 1) {
+            refundSum = ticket.getPrice() * 0.2*100;
+        } else {
+            refundSum = ticket.getPrice() * 0.5*100;
+        }
+
+        RefundCreateParams params = RefundCreateParams
+                .builder()
+                .setPaymentIntent(stripePaymentIntent)
+                .setAmount((long) refundSum)
+                .build();
+
+        PurchaseHistory purchaseHistory1 = new PurchaseHistory(
+                null,
+                purchaseHistory.getUser(),
+                purchaseHistory.getTicket(),
+                purchaseHistory.getPayType(),
+                true,
+                null
+        );
+
+        purchaseHistoryRepository.save(purchaseHistory1);
+
+        ticket.setStatus(TicketStatus.REFUNDED);
+        ticketRepository.save(ticket);
+
         try {
-            Stripe.apiKey = stripeApiKey;
-            RefundCreateParams params = RefundCreateParams
-                    .builder()
-                    .setPaymentIntent(paymentIntent)
-                    .setAmount(refundSum.longValue())
-                    .build();
             Refund refund = Refund.create(params);
-            return refund.getStatus().equals("succeeded");
         } catch (StripeException e) {
             e.printStackTrace();
-            return false;
         }
+        return ResponseEntity.ok("succeeded");
     }
 }
