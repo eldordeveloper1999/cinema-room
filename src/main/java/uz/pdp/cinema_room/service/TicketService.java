@@ -14,6 +14,7 @@ import com.itextpdf.layout.property.TextAlignment;
 import net.glxn.qrgen.javase.QRCode;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
@@ -155,7 +156,7 @@ public class TicketService {
 
         Session session = Session.getInstance(props, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("ch.eldor1999@gmail.com", "choriyev1007");
+                return new PasswordAuthentication("ch.eldor1999@gmail.com", "faexwlxixjfgpmpr");
             }
         });
         Message msg = new MimeMessage(session);
@@ -169,7 +170,9 @@ public class TicketService {
         MimeBodyPart messageBodyPart = new MimeBodyPart();
         messageBodyPart.setContent("Cinema room email", "text/html");
 
+//        MimeMessageHelper// for update
         Multipart multipart = new MimeMultipart();
+
         multipart.addBodyPart(messageBodyPart);
         MimeBodyPart attachPart = new MimeBodyPart();
         attachPart.attachFile(pdfUrl);

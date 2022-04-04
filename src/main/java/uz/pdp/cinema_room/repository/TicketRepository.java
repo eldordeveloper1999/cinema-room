@@ -27,7 +27,6 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
     @Query(nativeQuery = true, value = "select * from tickets where id = :id")
     Ticket getTicketBYId(UUID id);
 
-
     @Query(nativeQuery = true, value = "select  " +
             "m.title as movieTitle from tickets\n" +
             "join reserved_halls rh on rh.id = tickets.reserved_hall_id\n" +
@@ -56,13 +55,6 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
             "where u.id = :Id and status = 'NEW'")
     List<Ticket> findAllByUserId(UUID Id);
 
-
-    @Query(nativeQuery = true, value = "select count(*) from tickets\n" +
-            "join reserved_halls rh on rh.id = tickets.reserved_hall_id\n" +
-            "join session_dates sd on sd.id = rh.session_date_id\n" +
-            "where status = 'PURCHASED' and sd.date = :date")
-    Integer getTicketsByDate(LocalDate date);
-
     @Query(nativeQuery = true, value = "select s.number as seat, " +
             "r.number as row, " +
             "h.name as hall, " +
@@ -78,17 +70,43 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
             "where t.id = :ticket_id")
     PdfWriterProjection getTicketPdfProjection(UUID ticket_id);
 
-
     @Query(nativeQuery = true, value = "select distinct sd.date from tickets t \n" +
             "join reserved_halls rh on rh.id = t.reserved_hall_id\n" +
             "join session_dates sd on sd.id = rh.session_date_id\n" +
             "where t.id =  :ticket_id")
     LocalDate getSessionDateForRefundTicket(UUID ticket_id);
 
-
     @Query(nativeQuery = true, value = "select st.time from tickets t " +
             "join reserved_halls rh on rh.id = t.reserved_hall_id " +
             "join session_times st on st.id = rh.end_time_id" +
             " where  t.id = :id")
     LocalTime getSessionTime(UUID id);
+
+    @Query(nativeQuery = true, value = "select count(*) from tickets\n" +
+            "join reserved_halls rh on rh.id = tickets.reserved_hall_id\n" +
+            "join session_dates sd on sd.id = rh.session_date_id\n" +
+            "where status = 'PURCHASED' and sd.date = :date")
+    Integer getTicketsByDate(LocalDate date);
+
+    @Query(nativeQuery = true, value = "select count(*) from tickets t\n" +
+            "join reserved_halls rh on rh.id = t.reserved_hall_id\n" +
+            "join session_dates sd on sd.id = rh.session_date_id\n" +
+            "where status = 'PURCHASED' and sd.date between :from and :to")
+    Integer getTicketsBetweenTwoDate(LocalDate from, LocalDate to);
+
+    @Query(nativeQuery = true, value = "select sum(price) from tickets join reserved_halls rh on rh.id = tickets.reserved_hall_id\n" +
+            "join session_dates sd on sd.id = rh.session_date_id\n" +
+            "where status = 'PURCHASED' and sd.date = :date")
+    Double getDailyIncome(LocalDate date);
+
+    @Query(nativeQuery = true, value = "select sum(price) from tickets join reserved_halls rh on rh.id = tickets.reserved_hall_id\n" +
+            "join session_dates sd on sd.id = rh.session_date_id\n" +
+            "where status = 'PURCHASED' and sd.date between :fromDate and :toDate")
+    Double getBetweenTwoDateIncome(LocalDate fromDate, LocalDate toDate);
+
+    @Query(nativeQuery = true, value = "")
+    Integer getDailyR_HCount(LocalDate date);
+
+    @Query(nativeQuery = true, value = "")
+    Integer getR_HCountBetweenTwoDate(LocalDate fromDate, LocalDate toDate);
 }

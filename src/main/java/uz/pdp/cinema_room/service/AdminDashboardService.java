@@ -8,17 +8,17 @@ import java.time.LocalDate;
 
 public interface AdminDashboardService {
 
-    Double getOutcomes();
-
-    Double getIncomes();
-
     Integer getDailyTicketSalesCount(LocalDate date);
 
-    Integer getMonthlyTicketSalesCount();
+    Integer getBetweenTwoDateTicketSalesCount(LocalDate from, LocalDate to);
 
     Integer getYearlyTicketSalesCount();
 
-    Integer getDailyR_HCount();
+    Integer getDailyR_HCount(LocalDate date);
 
-    Integer getMonthlyR_HCount();
+    Integer getR_HCountBetweenTwoDate(LocalDate fromDate, LocalDate toDate);
+
+    Double getDailyIncome(LocalDate date);
+
+    Double getBetweenTwoDateIncome(LocalDate fromDate, LocalDate toDate);
 }
