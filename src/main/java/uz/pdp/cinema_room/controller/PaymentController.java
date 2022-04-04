@@ -137,6 +137,7 @@ public class PaymentController {
                     try {
                         String s = ticketService.generatePdfTicket(ticket.getId());
                         ticketService.sendmail(ticket.getId(), s);
+                        System.out.println(("Notification email successfully sent"));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -149,8 +150,8 @@ public class PaymentController {
             Duration duration = Duration.between(LocalDateTime.now(), localDateTime);
 
             long l = duration.toMinutes();
-            timer.schedule(timerTask, (l - 68) * 60000);
-            System.out.println("after " + (l-69) + " minutes email will be sendee!");
+            timer.schedule(timerTask, (l - 120) * 60000);
+            System.out.println("after " + (l-120) + " minutes email will be sendee!");
         }
         System.out.println("Current User ID: " + session.getClientReferenceId());
     }
