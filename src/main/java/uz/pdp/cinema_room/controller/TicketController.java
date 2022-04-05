@@ -29,11 +29,10 @@ public class TicketController {
     @Autowired
     TicketRepository ticketRepository;
 
-    @GetMapping("/{rh_id}/{seat_id}/{user_id}")
+    @GetMapping("/{rh_id}/{seat_id}")
     public ResponseEntity<ApiResponse> getTicket(@PathVariable UUID rh_id,
-                                                 @PathVariable UUID seat_id,
-                                                 @PathVariable UUID user_id) {
-
+                                                 @PathVariable UUID seat_id) {
+            UUID user_id = UUID.fromString("629a3524-7018-4f58-ad8e-0a1027de5f2c");
         UUID ticket_id = ticketService.saveTicket(user_id, rh_id, seat_id);
         return ResponseEntity.ok(new ApiResponse(true, "success", ticketService.getTicket(ticket_id)));
     }
@@ -50,11 +49,6 @@ public class TicketController {
         TicketStatus status = TicketStatus.getStatusByDisplayStatus("purchased");
         ticket.setStatus(status);
         ticketRepository.save(ticket);
-        try {
-            ticketService.sendmail(ticket.getId(), pdfTicketUrl);
-        } catch (MessagingException | IOException e) {
-            e.printStackTrace();
-        }
         return ResponseEntity.ok("success");
     }
 

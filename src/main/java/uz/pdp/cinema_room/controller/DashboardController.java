@@ -55,7 +55,7 @@ public class DashboardController {
 
     @GetMapping("/movie_sessions/between")
     public HttpEntity getSessionsBetweenTwoDate(@RequestParam("from") String from, 
-                                        @RequestParam("to") String to) {
+                                        @RequestParam("to") String to)   {
         LocalDate fromDate = LocalDate.parse(from);
         LocalDate toDate = LocalDate.parse(to);
         return ResponseEntity.ok(adminDashboardServiceImpl.getR_HCountBetweenTwoDate(fromDate, toDate));

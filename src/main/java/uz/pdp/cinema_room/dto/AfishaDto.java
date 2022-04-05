@@ -6,13 +6,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReservedHallDto {
+@Data
+public class AfishaDto {
 
-    private UUID hall_id;
-    private UUID afisha_id;
-    private UUID sessionDate_id;
-    private UUID start_time_id;
+    private String movieId;
 }

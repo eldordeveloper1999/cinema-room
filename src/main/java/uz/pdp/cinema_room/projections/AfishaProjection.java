@@ -21,10 +21,6 @@ public interface AfishaProjection {
     @Value("#{@sessionDateRepository.findByAfishaId(target.id) }")
     SessionDateProjection getDate();
 
-    LocalTime getStart_time();
-
-    LocalTime getEnd_time();
-
     @Value("#{@hallRepository.findByAfishaId(target.id)}")
     List<HallProjection> getHall();
 

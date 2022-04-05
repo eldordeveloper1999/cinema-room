@@ -32,13 +32,13 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
 
     @Override
     public Integer getDailyR_HCount(LocalDate date) {
-        return ticketRepository.getDailyR_HCount(date);
+        return null; //ticketRepository.getDailyR_HCount(date);
     }
 
     @Override
     public Integer getR_HCountBetweenTwoDate(LocalDate fromDate, LocalDate toDate) {
-        return
-                ticketRepository.getR_HCountBetweenTwoDate(fromDate, toDate);
+        return null;
+               // ticketRepository.getR_HCountBetweenTwoDate(fromDate, toDate);
     }
 
     @Override

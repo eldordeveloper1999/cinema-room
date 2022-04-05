@@ -14,15 +14,17 @@ import com.itextpdf.layout.property.TextAlignment;
 import net.glxn.qrgen.javase.QRCode;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
+import org.thymeleaf.TemplateEngine;
 import uz.pdp.cinema_room.model.*;
 import uz.pdp.cinema_room.projections.PdfWriterProjection;
 import uz.pdp.cinema_room.projections.TicketProjection;
 import uz.pdp.cinema_room.repository.*;
-
+import org.thymeleaf.context.Context;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.io.*;
@@ -32,6 +34,12 @@ import static java.time.LocalTime.now;
 
 @Service
 public class TicketService {
+
+    @Autowired
+    TemplateEngine templateEngine;
+
+    @Autowired
+    private JavaMailSender emailSender;
 
     @Autowired
     TicketRepository ticketRepository;
@@ -230,5 +238,31 @@ public class TicketService {
 
     public Ticket getTicketById(UUID ticket_id) {
         return ticketRepository.getTicketBYId(ticket_id);
+    }
+
+    public void sendEmailWithTemplate(String to) {
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            String from = "ch.eldor1999@gmail.com";
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            helper.setFrom(from);
+            helper.setTo(to);
+            helper.setSubject("Cinema room");
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("message", "You successfully purchased ticket!!!");
+            variables.put("name", "Max Alberto");
+            Context context = new Context();
+            context.setVariables(variables);
+
+            String html = templateEngine.process("email_template.html", context);
+
+            helper.setText(html, true);
+
+            emailSender.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
     }
 }

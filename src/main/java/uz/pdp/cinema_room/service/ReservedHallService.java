@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uz.pdp.cinema_room.dto.ReservedHallDto;
 import uz.pdp.cinema_room.model.*;
+import uz.pdp.cinema_room.projections.Reserved_HallProjection;
 import uz.pdp.cinema_room.repository.*;
 
 import java.io.IOException;
@@ -28,8 +29,8 @@ public class ReservedHallService {
     @Autowired
     AfishaRepository afishaRepository;
 
-    public List<ReservedHall> getAllReservedHalls() {
-        return reservedHallRepository.findAll();
+    public List<Reserved_HallProjection> getAllReservedHalls() {
+        return reservedHallRepository.getAllReservedHalls();
     }
 
     public ReservedHall getReservedHallById(UUID uuid) {

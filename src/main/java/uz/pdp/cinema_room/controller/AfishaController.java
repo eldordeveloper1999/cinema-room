@@ -10,9 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uz.pdp.cinema_room.api_response.ApiResponse;
+import uz.pdp.cinema_room.dto.AfishaDto;
 import uz.pdp.cinema_room.model.Afisha;
 import uz.pdp.cinema_room.projections.AfishaProjection;
 import uz.pdp.cinema_room.projections.MovieProjection;
+import uz.pdp.cinema_room.repository.MovieRepository;
 import uz.pdp.cinema_room.service.AfishaService;
 import uz.pdp.cinema_room.service.AfishaService;
 
@@ -26,14 +28,21 @@ public class AfishaController {
     @Autowired
     AfishaService afishaService;
 
+    @Autowired
+    MovieRepository movieRepository;
+
     @PostMapping
-    public ResponseEntity<ApiResponse> saveAfisha(@RequestPart("data") Afisha afisha) {
+    public HttpEntity saveAfisha(@RequestBody AfishaDto afishaDto) {
+
+
+
+        Afisha afisha = new Afisha(movieRepository.getById(UUID.fromString(afishaDto.getMovieId())), true);
         try {
             afishaService.saveOrUpdateAfisha(null, afisha);
-            return new ResponseEntity<>(new ApiResponse(true, "created", afisha), HttpStatus.OK);
+            return ResponseEntity.ok("success");
         } catch (IOException ignored) {
         }
-        return new ResponseEntity<>(new ApiResponse(false, "error", afisha), HttpStatus.BAD_REQUEST);
+        return ResponseEntity.ok("error");
     }
 
     @GetMapping
@@ -42,9 +51,9 @@ public class AfishaController {
             @RequestParam(name = "size", defaultValue = "2") int size
     ) {
         Pageable paging = PageRequest.of(page, size);
-        Page<AfishaProjection> movies = afishaService.afishaList(paging);
+        Page<AfishaProjection> afisha = afishaService.afishaList(paging);
 
-        ApiResponse res = new ApiResponse(true, "success", movies);
+        ApiResponse res = new ApiResponse(true, "success", afisha);
 
         return ResponseEntity.ok(res);
     }
