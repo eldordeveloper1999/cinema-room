@@ -2,6 +2,7 @@ package uz.pdp.cinema_room.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Repository;
 import uz.pdp.cinema_room.dto.TicketDto;
 import uz.pdp.cinema_room.model.Ticket;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
+@EnableJpaRepositories
 public interface TicketRepository extends JpaRepository<Ticket, UUID> {
 
 
@@ -104,9 +106,9 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
             "where status = 'PURCHASED' and sd.date between :fromDate and :toDate")
     Double getBetweenTwoDateIncome(LocalDate fromDate, LocalDate toDate);
 
-    @Query(nativeQuery = true, value = "")
-    Integer getDailyR_HCount(LocalDate date);
+  //  @Query(nativeQuery = true, value = "")
+  //  Integer getDailyR_HCount(LocalDate date);
 
-    @Query(nativeQuery = true, value = "")
-    Integer getR_HCountBetweenTwoDate(LocalDate fromDate, LocalDate toDate);
+  //  @Query(nativeQuery = true, value = "")
+   // Integer getR_HCountBetweenTwoDate(LocalDate fromDate, LocalDate toDate);
 }

@@ -129,14 +129,22 @@ public class PaymentController {
                     session.getPaymentIntent()
             );
             purchaseHistoryRepository.save(purchaseHistory);
+            String s = null;
+            try {
+                s = ticketService.generatePdfTicket(ticket.getId());
+                String email = session.getCustomerDetails().getEmail();
+                ticketService.sendEmailWithTemplate(email);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             LocalDate date = ticketRepository.getSessionDateForRefundTicket(ticket.getId());
             LocalTime time = ticketRepository.getSessionTime(ticket.getId());
+            String finalS = s;
             TimerTask timerTask = new TimerTask() {
                 @Override
                 public void run() {
                     try {
-                        String s = ticketService.generatePdfTicket(ticket.getId());
-                        ticketService.sendmail(ticket.getId(), s);
+                        ticketService.sendmail(ticket.getId(), finalS);
                         System.out.println(("Notification email successfully sent"));
                     } catch (Exception e) {
                         e.printStackTrace();

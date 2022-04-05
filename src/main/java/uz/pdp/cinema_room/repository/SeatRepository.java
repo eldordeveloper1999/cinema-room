@@ -11,14 +11,17 @@ import java.util.UUID;
 
 public interface SeatRepository extends JpaRepository<Seat, UUID> {
 
-    @Query(nativeQuery = true, value = "select cast(s.id as varchar) as id, s.number as number  from seats s\n" +
-            "join \"rows\" r on r.id = s.row_id\n" +
-            "join halls h on h.id = r.hall_id\n" +
-            "join reserved_halls rh on h.id = rh.hall_id\n" +
-            "join afishalar a on a.id = rh.afisha_id\n" +
-            "join session_times st on st.id = rh.end_time_id\n" +
-            "where rh.id = :uuid AND s.id not in (select t1.seat_id from tickets t1\n" +
-            "where t1.status = 'NEW' or t1.status = 'PURCHASED')")
+    @Query(nativeQuery = true, value = "select cast(s.id as varchar) as id, s.number as number\n" +
+            "from seats s\n" +
+            "         join \"rows\" r on r.id = s.row_id\n" +
+            "        join reserved_halls rh on r.hall_id = rh.hall_id\n" +
+            "         join session_times st on st.id = rh.start_time_id\n" +
+            "         join session_dates sd on sd.id = rh.session_date_id\n" +
+            "where rh.id = :uuid\n" +
+            "  and s.id not in (select t1.seat_id\n" +
+            "                   from tickets t1\n" +
+            "                   where t1.status = 'NEW'\n" +
+            "                      or t1.status = 'PURCHASED' and t1.reserved_hall_id=:uuid)")
     List<SeatProjection> findAvailableSeatsByRHId(UUID uuid);
 
 
