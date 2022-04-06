@@ -240,7 +240,7 @@ public class TicketService {
         return ticketRepository.getTicketBYId(ticket_id);
     }
 
-    public void sendEmailWithTemplate(String to) {
+    public void sendEmailWithTemplate(String to, List<PdfWriterProjection> allByUserId) {
         try {
             MimeMessage message = emailSender.createMimeMessage();
             String from = "ch.eldor1999@gmail.com";
@@ -252,11 +252,11 @@ public class TicketService {
 
             Map<String, Object> variables = new HashMap<>();
             variables.put("message", "You successfully purchased ticket!!!");
-            variables.put("name", "Max Alberto");
+            variables.put("ticketList", allByUserId);
             Context context = new Context();
             context.setVariables(variables);
 
-            String html = templateEngine.process("email_template.html", context);
+            String html = templateEngine.process("email-template.html", context);
 
             helper.setText(html, true);
 

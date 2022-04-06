@@ -63,6 +63,12 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     PayTypeRepository payTypeRepository;
 
+    @Autowired
+    RefundChargeFeeRepository refundChargeFeeRepository;
+
+    @Autowired
+    CashBoxRepository cashBoxRepository;
+
     @Override
     public void run(String... args) throws Exception {
 //        List<Hall> hallList = new ArrayList<>(Arrays.asList(
@@ -121,6 +127,16 @@ public class DataLoader implements CommandLineRunner {
 //        ));
 //
 //        seatRepository.saveAll(seats);
+
+//        List<RefundChargeFee> refundChargeFeeList = new ArrayList<>(Arrays.asList(
+//           new RefundChargeFee(10000, 30.0),
+//           new RefundChargeFee(30000, 20.0),
+//           new RefundChargeFee(50000, 10.0)
+//        ));
+//
+//        refundChargeFeeRepository.saveAll(refundChargeFeeList);
+
+//           cashBoxRepository.save(new CashBox("Primary", 0.0));
 
         List<Attachment> all = attachmentRepository.findAll();
 

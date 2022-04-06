@@ -106,7 +106,25 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
             "where status = 'PURCHASED' and sd.date between :fromDate and :toDate")
     Double getBetweenTwoDateIncome(LocalDate fromDate, LocalDate toDate);
 
-  //  @Query(nativeQuery = true, value = "")
+
+    @Query(nativeQuery = true, value = "select s.number as seat, " +
+            "r.number as row, " +
+            "h.name as hall, " +
+            "st.time as time, " +
+            "m.title as movieName from tickets t\n" +
+            "join seats s on t.seat_id = s.id\n" +
+            "join \"rows\" r on r.id = s.row_id\n" +
+            "join reserved_halls rh on rh.id = t.reserved_hall_id\n" +
+            "join halls h on h.id = rh.hall_id\n" +
+            "join session_times st on st.id = rh.end_time_id\n" +
+            "join afishalar a on a.id = rh.afisha_id\n" +
+            "join movies m on m.id = a.movie_id\n" +
+            "    join carts c on c.id = t.cart_id\n" +
+            "join users u on u.id = c.user_id\n" +
+            "where u.id = :id and status = 'NEW'")
+    List<PdfWriterProjection> getAllByUserId(UUID id);
+
+    //  @Query(nativeQuery = true, value = "")
   //  Integer getDailyR_HCount(LocalDate date);
 
   //  @Query(nativeQuery = true, value = "")
