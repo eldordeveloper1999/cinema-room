@@ -27,4 +27,9 @@ public class CashBox {
     private String name;
 
     private Double balance;
+
+    public CashBox(String name, Double balance) {
+        this.name = name;
+        this.balance = balance;
+    }
 }

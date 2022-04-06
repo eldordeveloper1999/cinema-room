@@ -14,12 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uz.pdp.cinema_room.dto.StripeResponseDto;
 import uz.pdp.cinema_room.dto.TicketDto;
+import uz.pdp.cinema_room.model.CashBox;
 import uz.pdp.cinema_room.model.PurchaseHistory;
 import uz.pdp.cinema_room.model.Ticket;
 import uz.pdp.cinema_room.model.TicketStatus;
-import uz.pdp.cinema_room.repository.PurchaseHistoryRepository;
-import uz.pdp.cinema_room.repository.PurchaseWaitingTimeRepository;
-import uz.pdp.cinema_room.repository.TicketRepository;
+import uz.pdp.cinema_room.repository.*;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -43,6 +42,12 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     TicketRepository ticketRepository;
 
+    @Autowired
+    RefundChargeFeeRepository refundChargeFeeRepository;
+
+    @Autowired
+    CashBoxRepository cashBoxRepository;
+
     @Override
     public HttpEntity createStripeSession(List<TicketDto> ticketDtoList) throws StripeException {
         // SUCCESS and FAILURE URLS
@@ -53,9 +58,16 @@ public class PaymentServiceImpl implements PaymentService {
 
         List<SessionCreateParams.LineItem> sessionItemList = new ArrayList<>();
 
+        double amount = 0;
+
         for (TicketDto ticketDto : ticketDtoList) {
+            amount += ticketDto.getPrice();
             sessionItemList.add(createSessionLineItem(ticketDto));
         }
+
+        SessionCreateParams.LineItem build = getLineItemForCommissionFee(amount);
+
+        sessionItemList.add(build);
 
         SessionCreateParams params = SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
@@ -72,40 +84,40 @@ public class PaymentServiceImpl implements PaymentService {
         return ResponseEntity.ok(session.getUrl());
     }
 
+    private SessionCreateParams.LineItem getLineItemForCommissionFee(double amount) {
+        SessionCreateParams.LineItem.PriceData priceData = SessionCreateParams.LineItem.PriceData.builder()
+                .setCurrency("usd")
+                .setUnitAmount((long) ((((amount * 100) + 30) / (0.971)) - amount * 100))
+                .setProductData(SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                        .setName("Commission Fee")
+                        .build())
+                .build();
+
+        SessionCreateParams.LineItem build = SessionCreateParams.LineItem.builder()
+                .setPriceData(priceData)
+                .setQuantity(1L)
+                .build();
+        return build;
+    }
+
     private SessionCreateParams.LineItem createSessionLineItem(TicketDto ticketDto) {
         return SessionCreateParams.LineItem.builder()
                 .setPriceData(createPriceData(ticketDto))
                 .setQuantity(1L)
+                .setDescription(ticketDto.getMovieTitle())
                 .build();
     }
 
     private SessionCreateParams.LineItem.PriceData createPriceData(TicketDto ticketDto) {
-        double amount = ((ticketDto.getPrice() * 100) + 30) / (0.971);
 
         return SessionCreateParams.LineItem.PriceData.builder()
                 .setCurrency("usd")
-                .setUnitAmount((long) amount)
+                .setUnitAmount((long) ticketDto.getPrice() * 100)
                 .setProductData(SessionCreateParams.LineItem.PriceData.ProductData.builder()
                         .setName(ticketDto.getMovieTitle())
                         .build())
                 .build();
     }
-
-//    public boolean refundTicket(String paymentIntent, Double refundSum) {
-//        try {
-//            Stripe.apiKey = stripeApiKey;
-//            RefundCreateParams params = RefundCreateParams
-//                    .builder()
-//                    .setPaymentIntent(paymentIntent)
-//                    .setAmount(refundSum.longValue())
-//                    .build();
-//            Refund refund = Refund.create(params);
-//            return refund.getStatus().equals("succeeded");
-//        } catch (StripeException e) {
-//            e.printStackTrace();
-//            return false;
-//        }
-//    }
 
     public HttpEntity refundTicket(UUID ticket_id) {
 
@@ -114,22 +126,20 @@ public class PaymentServiceImpl implements PaymentService {
 
         String stripePaymentIntent = purchaseHistory.getStripePaymentIntent();
 
-        Ticket ticket= ticketRepository.getTicketBYId(ticket_id);
+        Ticket ticket = ticketRepository.getTicketBYId(ticket_id);
 
         LocalDate sessionDate = ticketRepository.getSessionDateForRefundTicket(ticket_id);
 
         Period period = Period.between(LocalDate.now(), sessionDate);
-        double refundSum;
-        if (period.getDays() <= 1) {
-            refundSum = ticket.getPrice() * 0.2*100;
-        } else {
-            refundSum = ticket.getPrice() * 0.5*100;
-        }
+
+        List<CashBox> cashBoxList = cashBoxRepository.findAll();
+
+        Double refundSum = refundChargeFeeRepository.getChargeFeeAmount(ticket_id, cashBoxList.get(0).getId());
 
         RefundCreateParams params = RefundCreateParams
                 .builder()
                 .setPaymentIntent(stripePaymentIntent)
-                .setAmount((long) refundSum)
+                .setAmount(refundSum.longValue())
                 .build();
 
         PurchaseHistory purchaseHistory1 = new PurchaseHistory(

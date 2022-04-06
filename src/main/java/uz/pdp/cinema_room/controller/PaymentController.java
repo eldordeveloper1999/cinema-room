@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.cinema_room.dto.TicketDto;
 import uz.pdp.cinema_room.model.*;
+import uz.pdp.cinema_room.projections.PdfWriterProjection;
+import uz.pdp.cinema_room.projections.TicketProjection;
 import uz.pdp.cinema_room.repository.PayTypeRepository;
 import uz.pdp.cinema_room.repository.PurchaseHistoryRepository;
 import uz.pdp.cinema_room.repository.TicketRepository;
@@ -116,6 +118,7 @@ public class PaymentController {
         User user = userRepository.findById(UUID.fromString(session.getClientReferenceId())).get();
         PayType payType = payTypeRepository.findByName("Stripe");
         List<Ticket> allByUserId = ticketRepository.findAllByUserId(UUID.fromString(session.getClientReferenceId()));
+        List<PdfWriterProjection> ticketProjection = ticketRepository.getAllByUserId(UUID.fromString(session.getClientReferenceId()));
         for (Ticket ticket : allByUserId) {
             TicketStatus status = TicketStatus.getStatusByDisplayStatus("purchased");
             ticket.setStatus(status);
@@ -133,7 +136,7 @@ public class PaymentController {
             try {
                 s = ticketService.generatePdfTicket(ticket.getId());
                 String email = session.getCustomerDetails().getEmail();
-                ticketService.sendEmailWithTemplate(email);
+                ticketService.sendEmailWithTemplate(email, ticketProjection);
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -27,4 +27,9 @@ public class RefundChargeFee {
     private Integer interval_in_minutes;
 
     private Double charge_fee_in_percentage;
+
+    public RefundChargeFee(Integer interval_in_minutes, Double charge_fee_in_percentage) {
+        this.interval_in_minutes = interval_in_minutes;
+        this.charge_fee_in_percentage = charge_fee_in_percentage;
+    }
 }
