@@ -4,16 +4,14 @@ package uz.pdp.cinema_room.command;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import uz.pdp.cinema_room.model.*;
 import uz.pdp.cinema_room.repository.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static java.time.LocalTime.now;
 
@@ -68,6 +66,15 @@ public class DataLoader implements CommandLineRunner {
 
     @Autowired
     CashBoxRepository cashBoxRepository;
+
+    @Autowired
+    RoleRepository roleRepo;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
+    PermissionRepository permissionRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -145,6 +152,52 @@ public class DataLoader implements CommandLineRunner {
         List<Specialist> specialistList = specialistRepository.findAll();
 
         List<Genre> genreList = genreRepository.findAll();
+
+//
+//        Role role_admin = roleRepo.save(new Role("ROLE_ADMIN"));
+//        Role role_user = roleRepo.save(new Role("ROLE_USER"));
+//
+//        Permission permission_1 = permissionRepository.save(new Permission("can_add_movie"));
+//        Permission permission_2 = permissionRepository.save(new Permission("can_delete_movie"));
+//
+//
+//
+//        Set<Role> roles = new HashSet<>();
+//        roles.add(role_admin);
+//        roles.add(role_user);
+//
+//        Set<Role> roles_user = new HashSet<>();
+//        roles_user.add(role_user);
+//
+//        Set<Permission> user_permission = new HashSet<>();
+//        user_permission.add(permission_1);
+//
+//        Set<Permission> admin_permission = new HashSet<>();
+//        admin_permission.add(permission_2);
+//        admin_permission.add(permission_1);
+//
+//        userRepository.save(
+//                new User("Eldor Choriyev",
+//                        "eldor",
+//                        passwordEncoder.encode("1"),
+//                        "ch.eldor1999@gmail.com",
+//                        "+998946250119",
+//                        roles,
+//                        user_permission
+//                )
+//        );
+//
+//        userRepository.save(
+//                new User("Max Alberto",
+//                        "max",
+//                        passwordEncoder.encode("1"),
+//                        "max@gmail.com",
+//                        "+99856787654",
+//                        roles_user,
+//                        user_permission
+//                        )
+//        );
+//
 
 
 //        List<SessionTime> sessionTimes = new ArrayList<>(Arrays.asList(
