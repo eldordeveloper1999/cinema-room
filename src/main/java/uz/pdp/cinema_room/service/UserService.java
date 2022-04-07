@@ -2,6 +2,7 @@ package uz.pdp.cinema_room.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,7 +12,9 @@ import uz.pdp.cinema_room.model.Role;
 import uz.pdp.cinema_room.model.User;
 import uz.pdp.cinema_room.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -36,9 +39,13 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username).orElseThrow(()
-        -> new IllegalStateException("User not found"));
+        User user = userRepository.findByUsername(username).get();
+        //        return userRepository.findByUsername(username).orElseThrow(()
+//        -> new IllegalStateException("User not found"));
+//
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), user.getAuthorities());
     }
+
 
 
     public User getUserById(UUID user_id) {

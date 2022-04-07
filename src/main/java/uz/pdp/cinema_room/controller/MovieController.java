@@ -40,10 +40,6 @@ public class MovieController {
         }
         return new ResponseEntity<>(new ApiResponse(false, "error", movie), HttpStatus.BAD_REQUEST);
     }
-//    @GetMapping
-//    public ResponseEntity<ApiResponse> getAllMovies() {
-//        return new ResponseEntity<>(new ApiResponse(true, "success", movieService.getMovies()), HttpStatus.OK);
-//    }
 
     @GetMapping
     public HttpEntity getAllMovie(

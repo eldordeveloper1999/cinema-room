@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class HomeController {
 
-    @GetMapping("/login")
-    public String get() {
-        return "login";
-    }
+//    @GetMapping("api/login")
+//    public String get() {
+//        return "login";
+//    }
 
     @GetMapping("/dashboard")
     public String getDashboard() {
