@@ -37,7 +37,6 @@ public class MovieService {
 
     public void saveOrUpdateMovie(UUID movieId, Movie movie, MultipartFile file) throws IOException {
         if (movieId != null) {
-            movieRepository.deleteById(movieId);
             Attachment attachment = new Attachment();
             attachment.setFileName(StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())));
             attachment.setContentType(file.getContentType());
