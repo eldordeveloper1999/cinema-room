@@ -31,6 +31,8 @@ public class LoginController {
     @Autowired
     private ClientRegistrationRepository clientRegistrationRepository;
 
+    @Autowired
+    private OAuth2AuthorizedClientService authorizedClientService;
 
     @GetMapping("/login")
     public String getLoginPage(Model model) {
@@ -49,9 +51,6 @@ public class LoginController {
 
         return "login";
     }
-
-    @Autowired
-    private OAuth2AuthorizedClientService authorizedClientService;
 
     @GetMapping("/loginSuccess")
     public String getLoginInfo(Model model, OAuth2AuthenticationToken authentication) {
