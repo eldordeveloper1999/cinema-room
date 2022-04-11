@@ -31,49 +31,49 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserService userService;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
-                .authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/api/movie").hasRole("ADMIN")
-                .antMatchers("/login", "/")
-                .permitAll()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .rememberMe()
-                .and()
-                .formLogin()
-                .loginPage("/login").permitAll()
-                .defaultSuccessUrl("/success")
-                .failureUrl("/failed")
-                .and()
-                .oauth2Login()
-                .loginPage("/login").permitAll()
-                .defaultSuccessUrl("/loginSuccess")
-                .failureUrl("/loginFailure")
-                .and()
-                .httpBasic();
-    }
-
-
 //    @Override
 //    protected void configure(HttpSecurity http) throws Exception {
-//
-//        AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManagerBean());
-//
-//        authenticationFilter.setFilterProcessesUrl("/api/login");
-//
-//        http.csrf().disable();
-//        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//        http.authorizeRequests().antMatchers("/api/login/**").permitAll();
-//        http.authorizeRequests().antMatchers(GET, "/api/movie/**").hasAnyAuthority("ROLE_USER");
-//        http.authorizeRequests().antMatchers(POST, "/api/movie/**").hasAnyAuthority("ROLE_ADMIN");
-//        http.authorizeRequests().anyRequest().authenticated();
-//        http.addFilter(authenticationFilter);
-//        http.addFilterBefore(new AuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+//        http
+//                .csrf().disable()
+//                .authorizeRequests()
+//                .antMatchers(HttpMethod.GET, "/api/movie").hasRole("ADMIN")
+//                .antMatchers("/login", "/")
+//                .permitAll()
+//                .anyRequest()
+//                .authenticated()
+//                .and()
+//                .rememberMe()
+//                .and()
+//                .formLogin()
+//                .loginPage("/login").permitAll()
+//                .defaultSuccessUrl("/success")
+//                .failureUrl("/failed")
+//                .and()
+//                .oauth2Login()
+//                .loginPage("/login").permitAll()
+//                .defaultSuccessUrl("/loginSuccess")
+//                .failureUrl("/loginFailure")
+//                .and()
+//                .httpBasic();
 //    }
+
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManagerBean());
+
+        authenticationFilter.setFilterProcessesUrl("/api/login");
+
+        http.csrf().disable();
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.authorizeRequests().antMatchers("/api/login/**").permitAll();
+        http.authorizeRequests().antMatchers(GET, "/api/movie/**").hasAnyAuthority("ROLE_USER");
+        http.authorizeRequests().antMatchers(POST, "/api/movie/**").hasAnyAuthority("ROLE_ADMIN");
+        http.authorizeRequests().anyRequest().authenticated();
+        http.addFilter(authenticationFilter);
+        http.addFilterBefore(new AuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+    }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -98,4 +98,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder getEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }
